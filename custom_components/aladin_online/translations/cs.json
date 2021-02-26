@@ -1,0 +1,19 @@
+{
+	"config": {
+		"step": {
+			"user": {
+				"title": "Aladin online (Česká republika)",
+				"data": {
+					"name": "Název",
+					"latitude": "Zeměpisná šířka",
+					"longitude": "Zeměpisná délka"
+				}
+			}
+		},
+		"abort": {
+			"already_configured": "Aladin online pro tento název je již nastaven.",
+			"service_unavailable": "Služba není dostupná.",
+			"location_unavailable": "Lokace není dostupná."
+		}
+	}
+}

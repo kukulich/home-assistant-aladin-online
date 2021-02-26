@@ -1,0 +1,8 @@
+{
+	"name": "Aladin online (Czech Republic)",
+	"content_in_root": false,
+	"domains": ["weather"],
+	"country": ["CS", "EN"],
+	"homeassistant": "2020.12.0",
+	"render_readme": true
+}

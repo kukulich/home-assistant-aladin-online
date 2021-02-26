@@ -1,0 +1,19 @@
+{
+	"config": {
+		"step": {
+			"user": {
+				"title": "Aladin online (Czech Republic)",
+				"data": {
+					"name": "Name",
+					"latitude": "Latitude",
+					"longitude": "Longitude"
+				}
+			}
+		},
+		"abort": {
+			"already_configured": "Aladin online for this name is already configured.",
+			"service_unavailable": "Service is not available.",
+			"location_unavailable": "Location is not available."
+		}
+	}
+}
