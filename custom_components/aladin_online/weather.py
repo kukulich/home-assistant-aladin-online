@@ -88,7 +88,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 		now = datetime.datetime.now()
 
 		for hourly_forecast in self._weather.hourly_forecasts:
-			if (hourly_forecast.datetime < now):
+			if hourly_forecast.datetime < now:
 				continue
 
 			forecast.append({
