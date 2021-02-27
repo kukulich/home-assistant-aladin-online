@@ -115,26 +115,22 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 
 		self._config: MappingProxyType = config
 
+		self._data = None
+
 	async def update(self) -> AladinWeather:
-		session = aiohttp_client.async_get_clientsession(self.hass)
-		response = await session.get(URL.format(self._config[CONF_LATITUDE], self._config[CONF_LONGITUDE]))
+		if self._should_update_data():
+			await self._update_data()
 
-		if response.status != HTTP_OK:
-			raise ServiceUnavailable
-
-		# The URL returns "text/html" so ignore content_type check
-		data = await response.json(content_type=None)
-
-		data_time = AladinOnlineCoordinator._format_datetime(data[DATA_TIME])
+		data_time = AladinOnlineCoordinator._format_datetime(self._data[DATA_TIME])
 		now = datetime.now()
 
 		actual_index = int(math.floor((now.timestamp() - data_time.timestamp()) / 3600))
 		condition_actual_index = int(math.floor(actual_index / 2))
 
-		parameters = data[DATA_PARAMETERS]
+		parameters = self._data[DATA_PARAMETERS]
 
 		actual_weather = AladinActualWeather(
-			AladinOnlineCoordinator._format_condition(data[DATA_CONDITIONS][condition_actual_index]),
+			AladinOnlineCoordinator._format_condition(self._data[DATA_CONDITIONS][condition_actual_index]),
 			AladinOnlineCoordinator._format_temperature(parameters[DATA_PARAMETER_TEMPERATURE][actual_index]),
 			AladinOnlineCoordinator._format_temperature(parameters[DATA_PARAMETER_APPARENT_TEMPERATURE][actual_index]),
 			AladinOnlineCoordinator._format_precipitation(parameters[DATA_PARAMETER_PRECIPITATION][actual_index]),
@@ -150,13 +146,13 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 
 		weather = AladinWeather(actual_weather)
 
-		for i in range(actual_index + 1, data[DATA_FORECAST_LENGTH]):
+		for i in range(actual_index + 1, self._data[DATA_FORECAST_LENGTH]):
 			forecast_datetime = data_time + timedelta(hours=i)
 			forecast_condition_index = int(math.floor(i / 2))
 
 			forecast = AladinWeatherForecast(
 				forecast_datetime,
-				AladinOnlineCoordinator._format_condition(data[DATA_CONDITIONS][forecast_condition_index]),
+				AladinOnlineCoordinator._format_condition(self._data[DATA_CONDITIONS][forecast_condition_index]),
 				AladinOnlineCoordinator._format_temperature(parameters[DATA_PARAMETER_TEMPERATURE][i]),
 				AladinOnlineCoordinator._format_precipitation(parameters[DATA_PARAMETER_PRECIPITATION][i]),
 				AladinOnlineCoordinator._format_pressure(parameters[DATA_PARAMETER_PRESSURE][i]),
@@ -167,6 +163,33 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 			weather.add_hourly_forecast(forecast)
 
 		return weather
+
+	def _should_update_data(self) -> bool:
+		if self._data is None:
+			return True
+
+		data_time = AladinOnlineCoordinator._format_datetime(self._data[DATA_TIME])
+		now = datetime.now()
+
+		# Update every six hours
+		if data_time.hour + 6 >= now.hour:
+			return True
+
+		# New day
+		if data_time.day != now.day and now.hour >= 1:
+			return True
+
+		return False
+
+	async def _update_data(self) -> None:
+		session = aiohttp_client.async_get_clientsession(self.hass)
+		response = await session.get(URL.format(self._config[CONF_LATITUDE], self._config[CONF_LONGITUDE]))
+
+		if response.status != HTTP_OK:
+			raise ServiceUnavailable
+
+		# The URL returns "text/html" so ignore content_type check
+		self._data = await response.json(content_type=None)
 
 	@staticmethod
 	def _format_datetime(raw: str) -> datetime:
