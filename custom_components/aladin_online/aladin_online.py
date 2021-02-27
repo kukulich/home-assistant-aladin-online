@@ -37,6 +37,7 @@ DATA_PARAMETER_TEMPERATURE = "TEMPERATURE"
 DATA_PARAMETER_WIND_DIRECTION = "WIND_DIRECTION"
 DATA_PARAMETER_WIND_SPEED = "WIND_SPEED"
 
+
 class AladinActualWeather:
 
 	def __init__(self, condition: str, temperature: float, pressure: float, humidity: float, wind_speed: float, wind_bearing: float) -> None:
@@ -85,7 +86,7 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 			raise ServiceUnavailable
 
 		# The URL returns "text/html" so ignore content_type check
-		data = await response.json(content_type = None)
+		data = await response.json(content_type=None)
 
 		data_time = AladinOnlineCoordinator._format_datetime(data[DATA_TIME])
 		now = datetime.now()
