@@ -71,7 +71,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 
 	@property
 	def wind_speed(self) -> float:
-		return self._weather.actual_weather.wind_speed
+		return self._weather.actual_weather.wind_speed_in_kilometers_per_hour
 
 	@property
 	def wind_bearing(self) -> float:
@@ -96,7 +96,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 				ATTR_FORECAST_CONDITION: hourly_forecast.condition,
 				ATTR_FORECAST_TEMP: hourly_forecast.temperature,
 				ATTR_FORECAST_PRECIPITATION: hourly_forecast.precipitation,
-				ATTR_FORECAST_WIND_SPEED: hourly_forecast.wind_speed,
+				ATTR_FORECAST_WIND_SPEED: hourly_forecast.wind_speed_in_kilometers_per_hour,
 				ATTR_FORECAST_WIND_BEARING: hourly_forecast.wind_bearing,
 			})
 

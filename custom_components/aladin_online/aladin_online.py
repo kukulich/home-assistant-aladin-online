@@ -30,23 +30,56 @@ DATA_TIME = "forecastTimeIso"
 DATA_FORECAST_LENGTH = "forecastLength"
 DATA_PARAMETERS = "parameterValues"
 DATA_CONDITIONS = "weatherIconNames"
+DATA_PARAMETER_CLOUDS = "CLOUDS_TOTAL"
 DATA_PARAMETER_HUMIDITY = "HUMIDITY"
 DATA_PARAMETER_PRECIPITATION = "PRECIPITATION_TOTAL"
 DATA_PARAMETER_PRESSURE = "PRESSURE"
+DATA_PARAMETER_SNOW_PRECIPITATION = "PRECIPITATION_SNOW"
 DATA_PARAMETER_TEMPERATURE = "TEMPERATURE"
+DATA_PARAMETER_APPARENT_TEMPERATURE = "APPARENT_TEMPERATURE"
 DATA_PARAMETER_WIND_DIRECTION = "WIND_DIRECTION"
 DATA_PARAMETER_WIND_SPEED = "WIND_SPEED"
+DATA_PARAMETER_WIND_GUST_SPEED = "WIND_GUST_SPEED"
+DATA_PARAMETER_WIND_GUST_DIRECTION = "WIND_GUST_DIRECTION"
 
 
 class AladinActualWeather:
 
-	def __init__(self, condition: str, temperature: float, pressure: float, humidity: float, wind_speed: float, wind_bearing: float) -> None:
+	def __init__(
+		self,
+		condition: str,
+		temperature: float,
+		apparent_temperature: float,
+		precipitation: float,
+		pressure: float,
+		humidity: float,
+		clouds: float,
+		wind_speed: float,
+		wind_bearing: float,
+		wind_gust_speed: float,
+		wind_gust_bearing: float,
+		snow_precipitation: float,
+	) -> None:
 		self.condition = condition
 		self.temperature = temperature
+		self.apparent_temperature = apparent_temperature
+		self.precipitation = precipitation
 		self.pressure = pressure
 		self.humidity = humidity
+		self.clouds = clouds
 		self.wind_speed = wind_speed
 		self.wind_bearing = wind_bearing
+		self.wind_gust_speed = wind_gust_speed
+		self.wind_gust_bearing = wind_gust_bearing
+		self.snow_precipitation = snow_precipitation
+
+	@property
+	def wind_speed_in_kilometers_per_hour(self) -> float:
+		return round(self.wind_speed * 3.6, 1)
+
+	@property
+	def wind_gust_speed_in_kilometers_per_hour(self) -> float:
+		return round(self.wind_gust_speed * 3.6, 1)
 
 
 class AladinWeatherForecast:
@@ -59,6 +92,10 @@ class AladinWeatherForecast:
 		self.pressure = pressure
 		self.wind_speed = wind_speed
 		self.wind_bearing = wind_bearing
+
+	@property
+	def wind_speed_in_kilometers_per_hour(self) -> float:
+		return round(self.wind_speed * 3.6, 1)
 
 
 class AladinWeather:
@@ -99,10 +136,16 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 		actual_weather = AladinActualWeather(
 			AladinOnlineCoordinator._format_condition(data[DATA_CONDITIONS][condition_actual_index]),
 			AladinOnlineCoordinator._format_temperature(parameters[DATA_PARAMETER_TEMPERATURE][actual_index]),
+			AladinOnlineCoordinator._format_temperature(parameters[DATA_PARAMETER_APPARENT_TEMPERATURE][actual_index]),
+			AladinOnlineCoordinator._format_precipitation(parameters[DATA_PARAMETER_PRECIPITATION][actual_index]),
 			AladinOnlineCoordinator._format_pressure(parameters[DATA_PARAMETER_PRESSURE][actual_index]),
-			AladinOnlineCoordinator._format_humidity(parameters[DATA_PARAMETER_HUMIDITY][actual_index]),
+			AladinOnlineCoordinator._format_percent(parameters[DATA_PARAMETER_HUMIDITY][actual_index]),
+			AladinOnlineCoordinator._format_percent(parameters[DATA_PARAMETER_CLOUDS][actual_index]),
 			AladinOnlineCoordinator._format_wind_speed(parameters[DATA_PARAMETER_WIND_SPEED][actual_index]),
 			AladinOnlineCoordinator._format_wind_direction(parameters[DATA_PARAMETER_WIND_DIRECTION][actual_index]),
+			AladinOnlineCoordinator._format_wind_speed(parameters[DATA_PARAMETER_WIND_GUST_SPEED][actual_index]),
+			AladinOnlineCoordinator._format_wind_direction(parameters[DATA_PARAMETER_WIND_GUST_DIRECTION][actual_index]),
+			AladinOnlineCoordinator._format_precipitation(parameters[DATA_PARAMETER_SNOW_PRECIPITATION][actual_index]),
 		)
 
 		weather = AladinWeather(actual_weather)
@@ -153,20 +196,20 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 		return round(raw, 1)
 
 	@staticmethod
+	def _format_percent(raw: float) -> float:
+		return round(raw * 100)
+
+	@staticmethod
 	def _format_precipitation(raw: float) -> float:
-		return round(raw, 1)
+		return max(round(raw, 1), 0)
 
 	@staticmethod
 	def _format_pressure(raw: float) -> float:
 		return round(raw / 100, 1)
 
 	@staticmethod
-	def _format_humidity(raw: float) -> float:
-		return round(raw * 100)
-
-	@staticmethod
 	def _format_wind_speed(raw: float) -> float:
-		return round(raw * 3.6, 1)
+		return round(raw, 1)
 
 	@staticmethod
 	def _format_wind_direction(raw: float) -> float:
