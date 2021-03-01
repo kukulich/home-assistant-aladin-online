@@ -168,15 +168,8 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 		if self._data is None:
 			return True
 
-		data_time = AladinOnlineCoordinator._format_datetime(self._data[DATA_TIME])
-		now = datetime.now()
-
-		# Update every six hours
-		if data_time.hour + 6 >= now.hour:
-			return True
-
-		# New day
-		if data_time.day != now.day and now.hour >= 1:
+		# Updates are in 0, 5, 12 and 17 hour so wait an hour to be sure the update is there
+		if datetime.now().hour in [1, 6, 13, 18]:
 			return True
 
 		return False
