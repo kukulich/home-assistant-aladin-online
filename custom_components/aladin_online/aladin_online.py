@@ -3,9 +3,11 @@ from homeassistant import core
 from homeassistant.components.weather import (
 	ATTR_CONDITION_CLEAR_NIGHT,
 	ATTR_CONDITION_CLOUDY,
-	ATTR_CONDITION_SUNNY,
 	ATTR_CONDITION_PARTLYCLOUDY,
 	ATTR_CONDITION_POURING,
+	ATTR_CONDITION_SNOWY,
+	ATTR_CONDITION_SUNNY,
+	ATTR_CONDITION_RAINY,
 )
 from homeassistant.const import (
 	CONF_LATITUDE,
@@ -192,6 +194,15 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 	@staticmethod
 	def _format_condition(raw: str) -> str:
 		mapping = {
+			"wi_cloud_snow_heavy": ATTR_CONDITION_SNOWY,
+			"wi_cloud_snow_medium": ATTR_CONDITION_SNOWY,
+			"wi_cloud_snow_light": ATTR_CONDITION_SNOWY,
+			"wi_night_cloud_snow": ATTR_CONDITION_SNOWY,
+			"wi_day_cloud_snow": ATTR_CONDITION_SNOWY,
+			"wi_day_cloud_rain": ATTR_CONDITION_RAINY,
+			"wi_night_cloud_rain": ATTR_CONDITION_RAINY,
+			"wi_cloud_rain_heavy": ATTR_CONDITION_RAINY,
+			"wi_cloud_rain_medium": ATTR_CONDITION_RAINY,
 			"wi_cloud_rain_light": ATTR_CONDITION_POURING,
 			"wi_cloud": ATTR_CONDITION_CLOUDY,
 			"wi_night_cloud": ATTR_CONDITION_PARTLYCLOUDY,
