@@ -11,3 +11,7 @@ class ServiceUnavailable(AladinOnlineException):
 
 class LocationUnavailable(AladinOnlineException):
     """Location is not available."""
+
+
+class NoData(AladinOnlineException):
+    """No data."""

@@ -24,7 +24,7 @@ from .const import (
 	LOGGER,
 	URL,
 )
-from .errors import ServiceUnavailable
+from .errors import NoData, ServiceUnavailable
 from types import MappingProxyType
 from typing import List
 
@@ -121,7 +121,11 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 
 	async def update(self) -> AladinWeather:
 		if self._should_update_data():
-			await self._update_data()
+			try:
+				await self._update_data()
+			except Exception as ex:
+				if self._data is None:
+					raise ex
 
 		data_time = AladinOnlineCoordinator._format_datetime(self._data[DATA_TIME])
 		now = datetime.now()
@@ -130,6 +134,9 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 		condition_actual_index = int(math.floor(actual_index / 2))
 
 		parameters = self._data[DATA_PARAMETERS]
+
+		if condition_actual_index >= len(self._data[DATA_CONDITIONS]):
+			raise NoData
 
 		actual_weather = AladinActualWeather(
 			AladinOnlineCoordinator._format_condition(self._data[DATA_CONDITIONS][condition_actual_index]),
