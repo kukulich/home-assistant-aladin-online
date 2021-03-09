@@ -23,6 +23,7 @@ from .aladin_online import AladinWeather
 from .const import (
 	DOMAIN,
 	DATA_COORDINATOR,
+	NAME,
 )
 
 SENSOR_APPARENT_TEMPERATURE = "apparent_temperature"
@@ -168,6 +169,16 @@ class SensorEntity(CoordinatorEntity):
 	@property
 	def icon(self) -> Optional[str]:
 		return SENSOR_ICONS[self._sensor_type] if self._sensor_type in SENSOR_ICONS else None
+
+	@property
+	def device_info(self):
+		return {
+			"identifiers": {(DOMAIN,)},
+			"model": "Weather forecast",
+			"default_name": "Weather forecast",
+			"manufacturer": NAME,
+			"entry_type": "service",
+		}
 
 	@property
 	def _weather(self) -> AladinWeather:
