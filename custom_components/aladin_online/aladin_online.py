@@ -235,7 +235,7 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 
 	@staticmethod
 	def _format_precipitation(raw: float) -> float:
-		return max(round(raw, 1), 0)
+		return abs(round(raw, 1))
 
 	@staticmethod
 	def _format_pressure(raw: float) -> float:
