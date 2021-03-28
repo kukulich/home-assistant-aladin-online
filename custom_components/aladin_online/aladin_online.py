@@ -221,8 +221,7 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 		if raw in mapping:
 			return mapping[raw]
 
-		# Temporary
-		LOGGER.debug("Unknown condition: {}".format(raw))
+		LOGGER.error("Unknown condition: {}".format(raw))
 		return ATTR_CONDITION_SUNNY
 
 	@staticmethod
