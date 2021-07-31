@@ -1,3 +1,4 @@
+from __future__ import annotations
 from homeassistant import config_entries, core
 from homeassistant.const import (
 	PERCENTAGE,
@@ -18,7 +19,6 @@ from homeassistant.const import (
 from homeassistant.helpers.typing import StateType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 from types import MappingProxyType
-from typing import Optional
 from .aladin_online import AladinWeather
 from .const import (
 	DOMAIN,
@@ -159,15 +159,15 @@ class SensorEntity(CoordinatorEntity):
 		return None
 
 	@property
-	def device_class(self) -> Optional[str]:
+	def device_class(self) -> str | None:
 		return SENSOR_DEVICE_CLASSES[self._sensor_type] if self._sensor_type in SENSOR_DEVICE_CLASSES else None
 
 	@property
-	def unit_of_measurement(self) -> Optional[str]:
+	def unit_of_measurement(self) -> str | None:
 		return SENSOR_UNIT_OF_MEASUREMENTS[self._sensor_type] if self._sensor_type in SENSOR_UNIT_OF_MEASUREMENTS else None
 
 	@property
-	def icon(self) -> Optional[str]:
+	def icon(self) -> str | None:
 		return SENSOR_ICONS[self._sensor_type] if self._sensor_type in SENSOR_ICONS else None
 
 	@property

@@ -1,3 +1,4 @@
+from __future__ import annotations
 from homeassistant import config_entries
 from homeassistant.const import (
 	CONF_NAME,
@@ -16,13 +17,13 @@ from .const import (
 	LOGGER,
 )
 from .errors import LocationUnavailable, ServiceUnavailable
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 
 class AladinOnlineConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 	"""Weather forecast config flow."""
 
-	async def async_step_user(self, user_input: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+	async def async_step_user(self, user_input: Dict[str, Any] | None = None) -> Dict[str, Any]:
 		"""Handle a config flow initialized by the user."""
 		errors = {}
 
