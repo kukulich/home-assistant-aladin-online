@@ -94,10 +94,7 @@ class AladinWeatherForecast:
 		self.pressure = pressure
 		self.wind_speed = wind_speed
 		self.wind_bearing = wind_bearing
-
-	@property
-	def wind_speed_in_kilometers_per_hour(self) -> float:
-		return round(self.wind_speed * 3.6, 1)
+		self.wind_speed_in_kilometers_per_hour = round(wind_speed * 3.6, 1)
 
 
 class AladinWeather:
