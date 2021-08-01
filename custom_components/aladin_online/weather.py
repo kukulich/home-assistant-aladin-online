@@ -13,9 +13,9 @@ from homeassistant.const import (
 	CONF_NAME,
 	TEMP_CELSIUS,
 )
+from homeassistant.core import callback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from typing import List
-from .aladin_online import AladinWeather
+from .aladin_online import AladinActualWeather
 from .const import (
 	DOMAIN,
 	DATA_COORDINATOR,
@@ -33,65 +33,47 @@ async def async_setup_entry(hass: core.HomeAssistant, config_entry: config_entri
 
 class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 
+	_attr_temperature_unit = TEMP_CELSIUS
+
 	def __init__(self, coordinator, config):
 		super().__init__(coordinator)
 
-		self._config = config
-
-	@property
-	def unique_id(self) -> str:
-		return "{}.{}".format(
-			self._config[CONF_NAME],
+		self._attr_unique_id = "{}.{}".format(
+			config[CONF_NAME],
 			"hourly",
 		)
 
-	@property
-	def name(self) -> str:
-		return self._config[CONF_NAME]
+		self._attr_name = config[CONF_NAME]
 
-	@property
-	def condition(self) -> str:
-		return self._weather.actual_weather.condition
+		self._attr_device_info = {
+			"identifiers": {(DOMAIN,)},
+			"model": "Weather forecast",
+			"default_name": "Weather forecast",
+			"manufacturer": NAME,
+			"entry_type": "service",
+		}
 
-	@property
-	def temperature(self) -> float:
-		return self._weather.actual_weather.temperature
+		self._update_attributes()
 
-	@property
-	def temperature_unit(self) -> str:
-		return TEMP_CELSIUS
+	def _update_attributes(self):
+		actual_weather: AladinActualWeather = self.coordinator.data.actual_weather
 
-	@property
-	def pressure(self) -> float:
-		return self._weather.actual_weather.pressure
-
-	@property
-	def humidity(self) -> float:
-		return self._weather.actual_weather.humidity
-
-	@property
-	def wind_speed(self) -> float:
-		return self._weather.actual_weather.wind_speed_in_kilometers_per_hour
-
-	@property
-	def wind_bearing(self) -> float:
-		return self._weather.actual_weather.wind_bearing
-
-	@property
-	def attribution(self):
-		return None
-
-	@property
-	def forecast(self) -> List[dict]:
-		forecast = []
+		self._attr_condition = actual_weather.condition
+		self._attr_humidity = actual_weather.humidity
+		self._attr_pressure = actual_weather.pressure
+		self._attr_temperature = actual_weather.temperature
+		self._attr_wind_bearing = actual_weather.wind_bearing
+		self._attr_wind_speed = actual_weather.wind_speed_in_kilometers_per_hour
 
 		now = datetime.datetime.now()
 
-		for hourly_forecast in self._weather.hourly_forecasts:
+		self._attr_forecast = []
+
+		for hourly_forecast in self.coordinator.data.hourly_forecasts:
 			if hourly_forecast.datetime < now:
 				continue
 
-			forecast.append({
+			self._attr_forecast.append({
 				ATTR_FORECAST_TIME: hourly_forecast.datetime,
 				ATTR_FORECAST_CONDITION: hourly_forecast.condition,
 				ATTR_FORECAST_TEMP: hourly_forecast.temperature,
@@ -100,18 +82,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 				ATTR_FORECAST_WIND_BEARING: hourly_forecast.wind_bearing,
 			})
 
-		return forecast
-
-	@property
-	def device_info(self):
-		return {
-			"identifiers": {(DOMAIN,)},
-			"model": "Weather forecast",
-			"default_name": "Weather forecast",
-			"manufacturer": NAME,
-			"entry_type": "service",
-		}
-
-	@property
-	def _weather(self) -> AladinWeather:
-		return self.coordinator.data
+	@callback
+	def _handle_coordinator_update(self) -> None:
+		self._update_attributes()
+		super()._handle_coordinator_update()

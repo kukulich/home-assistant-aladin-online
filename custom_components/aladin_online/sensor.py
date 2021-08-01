@@ -16,10 +16,10 @@ from homeassistant.components.sensor import (
 from homeassistant.const import (
 	CONF_NAME,
 )
-from homeassistant.helpers.typing import StateType
+from homeassistant.core import callback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 from types import MappingProxyType
-from .aladin_online import AladinWeather
+from .aladin_online import AladinActualWeather
 from .const import (
 	DOMAIN,
 	DATA_COORDINATOR,
@@ -112,67 +112,22 @@ class SensorEntity(CoordinatorEntity):
 	def __init__(self, coordinator: DataUpdateCoordinator, config: MappingProxyType, sensor_type: str):
 		super().__init__(coordinator)
 
-		self._config: MappingProxyType = config
 		self._sensor_type: str = sensor_type
 
-	@property
-	def unique_id(self) -> str:
-		return "{}.{}".format(
-			self._config[CONF_NAME],
+		self._attr_unique_id = "{}.{}".format(
+			config[CONF_NAME],
 			self._sensor_type,
 		)
 
-	@property
-	def name(self) -> str:
-		return "{}: {}".format(
-			self._config[CONF_NAME],
+		self._attr_name = "{}: {}".format(
+			config[CONF_NAME],
 			SENSOR_NAMES[self._sensor_type],
 		)
+		self._attr_icon = SENSOR_ICONS[self._sensor_type] if self._sensor_type in SENSOR_ICONS else None
+		self._attr_unit_of_measurement = SENSOR_UNIT_OF_MEASUREMENTS[self._sensor_type] if self._sensor_type in SENSOR_UNIT_OF_MEASUREMENTS else None
 
-	@property
-	def state(self) -> StateType:
-		actual_weather = self._weather.actual_weather
-
-		if self._sensor_type == SENSOR_APPARENT_TEMPERATURE:
-			return actual_weather.apparent_temperature
-		elif self._sensor_type == SENSOR_CLOUDS:
-			return actual_weather.clouds
-		elif self._sensor_type == SENSOR_HUMIDITY:
-			return actual_weather.humidity
-		elif self._sensor_type == SENSOR_PRECIPITATION:
-			return actual_weather.precipitation
-		elif self._sensor_type == SENSOR_PRESSURE:
-			return actual_weather.pressure
-		elif self._sensor_type == SENSOR_SNOW_PRECIPITATION:
-			return actual_weather.snow_precipitation
-		elif self._sensor_type == SENSOR_TEMPERATURE:
-			return actual_weather.temperature
-		elif self._sensor_type == SENSOR_WIND_SPEED:
-			return actual_weather.wind_speed
-		elif self._sensor_type == SENSOR_WIND_SPEED_IN_KILOMETERS_PER_HOUR:
-			return actual_weather.wind_speed_in_kilometers_per_hour
-		elif self._sensor_type == SENSOR_WIND_GUST_SPEED:
-			return actual_weather.wind_gust_speed
-		elif self._sensor_type == SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR:
-			return actual_weather.wind_gust_speed_in_kilometers_per_hour
-
-		return None
-
-	@property
-	def device_class(self) -> str | None:
-		return SENSOR_DEVICE_CLASSES[self._sensor_type] if self._sensor_type in SENSOR_DEVICE_CLASSES else None
-
-	@property
-	def unit_of_measurement(self) -> str | None:
-		return SENSOR_UNIT_OF_MEASUREMENTS[self._sensor_type] if self._sensor_type in SENSOR_UNIT_OF_MEASUREMENTS else None
-
-	@property
-	def icon(self) -> str | None:
-		return SENSOR_ICONS[self._sensor_type] if self._sensor_type in SENSOR_ICONS else None
-
-	@property
-	def device_info(self):
-		return {
+		self._attr_device_class = SENSOR_DEVICE_CLASSES[self._sensor_type] if self._sensor_type in SENSOR_DEVICE_CLASSES else None
+		self._attr_device_info = {
 			"identifiers": {(DOMAIN,)},
 			"model": "Weather forecast",
 			"default_name": "Weather forecast",
@@ -180,6 +135,35 @@ class SensorEntity(CoordinatorEntity):
 			"entry_type": "service",
 		}
 
-	@property
-	def _weather(self) -> AladinWeather:
-		return self.coordinator.data
+		self._update_attributes()
+
+	def _update_attributes(self):
+		actual_weather: AladinActualWeather = self.coordinator.data.actual_weather
+
+		if self._sensor_type == SENSOR_APPARENT_TEMPERATURE:
+			self._attr_state = actual_weather.apparent_temperature
+		elif self._sensor_type == SENSOR_CLOUDS:
+			self._attr_state = actual_weather.clouds
+		elif self._sensor_type == SENSOR_HUMIDITY:
+			self._attr_state = actual_weather.humidity
+		elif self._sensor_type == SENSOR_PRECIPITATION:
+			self._attr_state = actual_weather.precipitation
+		elif self._sensor_type == SENSOR_PRESSURE:
+			self._attr_state = actual_weather.pressure
+		elif self._sensor_type == SENSOR_SNOW_PRECIPITATION:
+			self._attr_state = actual_weather.snow_precipitation
+		elif self._sensor_type == SENSOR_TEMPERATURE:
+			self._attr_state = actual_weather.temperature
+		elif self._sensor_type == SENSOR_WIND_SPEED:
+			self._attr_state = actual_weather.wind_speed
+		elif self._sensor_type == SENSOR_WIND_SPEED_IN_KILOMETERS_PER_HOUR:
+			self._attr_state = actual_weather.wind_speed_in_kilometers_per_hour
+		elif self._sensor_type == SENSOR_WIND_GUST_SPEED:
+			self._attr_state = actual_weather.wind_gust_speed
+		elif self._sensor_type == SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR:
+			self._attr_state = actual_weather.wind_gust_speed_in_kilometers_per_hour
+
+	@callback
+	def _handle_coordinator_update(self) -> None:
+		self._update_attributes()
+		super()._handle_coordinator_update()
