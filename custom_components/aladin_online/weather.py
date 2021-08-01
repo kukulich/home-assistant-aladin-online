@@ -14,7 +14,8 @@ from homeassistant.const import (
 	TEMP_CELSIUS,
 )
 from homeassistant.core import callback
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
+from types import MappingProxyType
 from .aladin_online import AladinActualWeather
 from .const import (
 	DOMAIN,
@@ -35,7 +36,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 
 	_attr_temperature_unit = TEMP_CELSIUS
 
-	def __init__(self, coordinator, config):
+	def __init__(self, coordinator: DataUpdateCoordinator, config: MappingProxyType):
 		super().__init__(coordinator)
 
 		self._attr_unique_id = "{}.{}".format(
