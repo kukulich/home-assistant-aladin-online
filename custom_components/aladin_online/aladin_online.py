@@ -86,8 +86,8 @@ class AladinActualWeather:
 
 class AladinWeatherForecast:
 
-	def __init__(self, datetime: datetime, condition: str, temperature: float, precipitation: float, pressure: float, wind_speed: float, wind_bearing: float) -> None:
-		self.datetime = datetime
+	def __init__(self, forecast_datetime: datetime, condition: str, temperature: float, precipitation: float, pressure: float, wind_speed: float, wind_bearing: float) -> None:
+		self.datetime = forecast_datetime
 		self.condition = condition
 		self.temperature = temperature
 		self.precipitation = precipitation
