@@ -19,6 +19,7 @@ from homeassistant.const import (
 from homeassistant.core import callback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 from types import MappingProxyType
+from typing import Final
 from .aladin_online import AladinActualWeather
 from .const import (
 	DOMAIN,
@@ -26,19 +27,19 @@ from .const import (
 	NAME,
 )
 
-SENSOR_APPARENT_TEMPERATURE = "apparent_temperature"
-SENSOR_CLOUDS = "clouds"
-SENSOR_HUMIDITY = "humidity"
-SENSOR_PRECIPITATION = "precipitation"
-SENSOR_PRESSURE = "pressure"
-SENSOR_SNOW_PRECIPITATION = "snow_precipitation"
-SENSOR_TEMPERATURE = "temperature"
-SENSOR_WIND_SPEED = "wind_speed"
-SENSOR_WIND_SPEED_IN_KILOMETERS_PER_HOUR = "wind_speed_in_km_h"
-SENSOR_WIND_GUST_SPEED = "wind_gust_speed"
-SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR = "wind_gust_speed_in_km_h"
+SENSOR_APPARENT_TEMPERATURE: Final = "apparent_temperature"
+SENSOR_CLOUDS: Final = "clouds"
+SENSOR_HUMIDITY: Final = "humidity"
+SENSOR_PRECIPITATION: Final = "precipitation"
+SENSOR_PRESSURE: Final = "pressure"
+SENSOR_SNOW_PRECIPITATION: Final = "snow_precipitation"
+SENSOR_TEMPERATURE: Final = "temperature"
+SENSOR_WIND_SPEED: Final = "wind_speed"
+SENSOR_WIND_SPEED_IN_KILOMETERS_PER_HOUR: Final = "wind_speed_in_km_h"
+SENSOR_WIND_GUST_SPEED: Final = "wind_gust_speed"
+SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR: Final = "wind_gust_speed_in_km_h"
 
-SENSORS = (
+SENSORS: Final = (
 	SENSOR_APPARENT_TEMPERATURE,
 	SENSOR_CLOUDS,
 	SENSOR_HUMIDITY,
@@ -52,7 +53,7 @@ SENSORS = (
 	SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR,
 )
 
-SENSOR_NAMES = {
+SENSOR_NAMES: Final = {
 	SENSOR_APPARENT_TEMPERATURE: "Apparent temperature",
 	SENSOR_CLOUDS: "Clouds",
 	SENSOR_HUMIDITY: "Humidity",
@@ -66,14 +67,14 @@ SENSOR_NAMES = {
 	SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR: "Wind gust speed ({})".format(SPEED_KILOMETERS_PER_HOUR),
 }
 
-SENSOR_DEVICE_CLASSES = {
+SENSOR_DEVICE_CLASSES: Final = {
 	SENSOR_APPARENT_TEMPERATURE: DEVICE_CLASS_TEMPERATURE,
 	SENSOR_HUMIDITY: DEVICE_CLASS_HUMIDITY,
 	SENSOR_PRESSURE: DEVICE_CLASS_PRESSURE,
 	SENSOR_TEMPERATURE: DEVICE_CLASS_TEMPERATURE,
 }
 
-SENSOR_UNIT_OF_MEASUREMENTS = {
+SENSOR_UNIT_OF_MEASUREMENTS: Final = {
 	SENSOR_APPARENT_TEMPERATURE: TEMP_CELSIUS,
 	SENSOR_CLOUDS: PERCENTAGE,
 	SENSOR_HUMIDITY: PERCENTAGE,
@@ -87,7 +88,7 @@ SENSOR_UNIT_OF_MEASUREMENTS = {
 	SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR: SPEED_KILOMETERS_PER_HOUR,
 }
 
-SENSOR_ICONS = {
+SENSOR_ICONS: Final = {
 	SENSOR_CLOUDS: "mdi:weather-partly-cloudy",
 	SENSOR_PRECIPITATION: "mdi:cup-water",
 	SENSOR_SNOW_PRECIPITATION: "mdi:weather-snowy",
