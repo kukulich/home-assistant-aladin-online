@@ -14,14 +14,24 @@ from homeassistant.const import (
 	TEMP_CELSIUS,
 )
 from homeassistant.core import callback
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 from types import MappingProxyType
+from typing import Final
 from .aladin_online import AladinActualWeather
 from .const import (
 	DOMAIN,
 	DATA_COORDINATOR,
 	NAME,
 )
+
+DEVICE_INFO: Final[DeviceInfo] = {
+	"identifiers": {(DOMAIN,)},
+	"model": "Weather forecast",
+	"default_name": "Weather forecast",
+	"manufacturer": NAME,
+	"entry_type": "service",
+}
 
 
 async def async_setup_entry(hass: core.HomeAssistant, config_entry: config_entries.ConfigEntry, async_add_entities) -> None:
@@ -46,13 +56,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 
 		self._attr_name = config[CONF_NAME]
 
-		self._attr_device_info = {
-			"identifiers": {(DOMAIN,)},
-			"model": "Weather forecast",
-			"default_name": "Weather forecast",
-			"manufacturer": NAME,
-			"entry_type": "service",
-		}
+		self._attr_device_info = DEVICE_INFO
 
 		self._update_attributes()
 

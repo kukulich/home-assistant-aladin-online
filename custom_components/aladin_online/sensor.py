@@ -17,6 +17,7 @@ from homeassistant.const import (
 	CONF_NAME,
 )
 from homeassistant.core import callback
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 from types import MappingProxyType
 from typing import Final
@@ -98,6 +99,13 @@ SENSOR_ICONS: Final = {
 	SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR: "mdi:weather-windy",
 }
 
+DEVICE_INFO: Final[DeviceInfo] = {
+	"identifiers": {(DOMAIN,)},
+	"model": "Weather forecast",
+	"default_name": "Weather forecast",
+	"manufacturer": NAME,
+	"entry_type": "service",
+}
 
 async def async_setup_entry(hass: core.HomeAssistant, config_entry: config_entries.ConfigEntry, async_add_entities) -> None:
 	coordinator = hass.data[DOMAIN][config_entry.entry_id][DATA_COORDINATOR]
@@ -128,13 +136,7 @@ class SensorEntity(CoordinatorEntity):
 		self._attr_unit_of_measurement = SENSOR_UNIT_OF_MEASUREMENTS[self._sensor_type] if self._sensor_type in SENSOR_UNIT_OF_MEASUREMENTS else None
 
 		self._attr_device_class = SENSOR_DEVICE_CLASSES[self._sensor_type] if self._sensor_type in SENSOR_DEVICE_CLASSES else None
-		self._attr_device_info = {
-			"identifiers": {(DOMAIN,)},
-			"model": "Weather forecast",
-			"default_name": "Weather forecast",
-			"manufacturer": NAME,
-			"entry_type": "service",
-		}
+		self._attr_device_info = DEVICE_INFO
 
 		self._update_attributes()
 
