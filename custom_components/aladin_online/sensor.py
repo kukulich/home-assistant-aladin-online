@@ -12,6 +12,8 @@ from homeassistant.components.sensor import (
 	DEVICE_CLASS_HUMIDITY,
 	DEVICE_CLASS_PRESSURE,
 	DEVICE_CLASS_TEMPERATURE,
+	SensorEntity,
+	STATE_CLASS_MEASUREMENT,
 )
 from homeassistant.const import (
 	CONF_NAME,
@@ -116,7 +118,7 @@ async def async_setup_entry(hass: core.HomeAssistant, config_entry: config_entri
 		])
 
 
-class SensorEntity(CoordinatorEntity):
+class SensorEntity(CoordinatorEntity, SensorEntity):
 
 	def __init__(self, coordinator: DataUpdateCoordinator, config: MappingProxyType, sensor_type: str):
 		super().__init__(coordinator)
@@ -134,6 +136,7 @@ class SensorEntity(CoordinatorEntity):
 		)
 		self._attr_icon = SENSOR_ICONS[self._sensor_type] if self._sensor_type in SENSOR_ICONS else None
 		self._attr_unit_of_measurement = SENSOR_UNIT_OF_MEASUREMENTS[self._sensor_type] if self._sensor_type in SENSOR_UNIT_OF_MEASUREMENTS else None
+		self._attr_state_class = STATE_CLASS_MEASUREMENT
 
 		self._attr_device_class = SENSOR_DEVICE_CLASSES[self._sensor_type] if self._sensor_type in SENSOR_DEVICE_CLASSES else None
 		self._attr_device_info = DEVICE_INFO
