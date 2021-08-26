@@ -135,7 +135,7 @@ class SensorEntity(CoordinatorEntity, SensorEntity):
 			SENSOR_NAMES[self._sensor_type],
 		)
 		self._attr_icon = SENSOR_ICONS[self._sensor_type] if self._sensor_type in SENSOR_ICONS else None
-		self._attr_unit_of_measurement = SENSOR_UNIT_OF_MEASUREMENTS[self._sensor_type] if self._sensor_type in SENSOR_UNIT_OF_MEASUREMENTS else None
+		self._attr_native_unit_of_measurement = SENSOR_UNIT_OF_MEASUREMENTS[self._sensor_type] if self._sensor_type in SENSOR_UNIT_OF_MEASUREMENTS else None
 		self._attr_state_class = STATE_CLASS_MEASUREMENT
 
 		self._attr_device_class = SENSOR_DEVICE_CLASSES[self._sensor_type] if self._sensor_type in SENSOR_DEVICE_CLASSES else None
@@ -147,27 +147,27 @@ class SensorEntity(CoordinatorEntity, SensorEntity):
 		actual_weather: AladinActualWeather = self.coordinator.data.actual_weather
 
 		if self._sensor_type == SENSOR_APPARENT_TEMPERATURE:
-			self._attr_state = actual_weather.apparent_temperature
+			self._attr_native_value = actual_weather.apparent_temperature
 		elif self._sensor_type == SENSOR_CLOUDS:
-			self._attr_state = actual_weather.clouds
+			self._attr_native_value = actual_weather.clouds
 		elif self._sensor_type == SENSOR_HUMIDITY:
-			self._attr_state = actual_weather.humidity
+			self._attr_native_value = actual_weather.humidity
 		elif self._sensor_type == SENSOR_PRECIPITATION:
-			self._attr_state = actual_weather.precipitation
+			self._attr_native_value = actual_weather.precipitation
 		elif self._sensor_type == SENSOR_PRESSURE:
-			self._attr_state = actual_weather.pressure
+			self._attr_native_value = actual_weather.pressure
 		elif self._sensor_type == SENSOR_SNOW_PRECIPITATION:
-			self._attr_state = actual_weather.snow_precipitation
+			self._attr_native_value = actual_weather.snow_precipitation
 		elif self._sensor_type == SENSOR_TEMPERATURE:
-			self._attr_state = actual_weather.temperature
+			self._attr_native_value = actual_weather.temperature
 		elif self._sensor_type == SENSOR_WIND_SPEED:
-			self._attr_state = actual_weather.wind_speed
+			self._attr_native_value = actual_weather.wind_speed
 		elif self._sensor_type == SENSOR_WIND_SPEED_IN_KILOMETERS_PER_HOUR:
-			self._attr_state = actual_weather.wind_speed_in_kilometers_per_hour
+			self._attr_native_value = actual_weather.wind_speed_in_kilometers_per_hour
 		elif self._sensor_type == SENSOR_WIND_GUST_SPEED:
-			self._attr_state = actual_weather.wind_gust_speed
+			self._attr_native_value = actual_weather.wind_gust_speed
 		elif self._sensor_type == SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR:
-			self._attr_state = actual_weather.wind_gust_speed_in_kilometers_per_hour
+			self._attr_native_value = actual_weather.wind_gust_speed_in_kilometers_per_hour
 
 	@callback
 	def _handle_coordinator_update(self) -> None:
