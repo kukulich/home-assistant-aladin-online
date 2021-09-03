@@ -1,7 +1,7 @@
  {
 	"domain": "aladin_online",
 	"name": "Aladin online (Czech Republic)",
-	"version": "1.0.0",
+	"version": "1.1.1",
 	"config_flow": true,
 	"documentation": "https://github.com/kukulich/home-assistant-weather-forecast-for-czech-republic",
 	"issue_tracker": "https://github.com/kukulich/home-assistant-weather-forecast-for-czech-republic/issues",
