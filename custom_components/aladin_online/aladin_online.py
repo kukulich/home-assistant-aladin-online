@@ -124,6 +124,9 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 				if self._data is None:
 					raise ex
 
+		if self._data is None:
+			raise ServiceUnavailable
+
 		data_time = AladinOnlineCoordinator._format_datetime(self._data[DATA_TIME])
 		now = datetime.now()
 
