@@ -12,11 +12,11 @@ from homeassistant.components.weather import (
 from homeassistant.const import (
 	CONF_LATITUDE,
 	CONF_LONGITUDE,
-	HTTP_OK,
 )
 from homeassistant.helpers import aiohttp_client
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import dt
+from http import HTTPStatus
 import math
 import pytz
 from .const import (
@@ -187,7 +187,7 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 		session = aiohttp_client.async_get_clientsession(self.hass)
 		response = await session.get(URL.format(self._config[CONF_LATITUDE], self._config[CONF_LONGITUDE]))
 
-		if response.status != HTTP_OK:
+		if response.status != HTTPStatus.OK:
 			raise ServiceUnavailable
 
 		# The URL returns "text/html" so ignore content_type check

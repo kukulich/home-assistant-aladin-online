@@ -4,10 +4,10 @@ from homeassistant.const import (
 	CONF_NAME,
 	CONF_LATITUDE,
 	CONF_LONGITUDE,
-	HTTP_OK,
 )
 from homeassistant.data_entry_flow import AbortFlow
 from homeassistant.helpers import aiohttp_client
+from http import HTTPStatus
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from .const import (
@@ -44,7 +44,7 @@ class AladinOnlineConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 				session = aiohttp_client.async_get_clientsession(self.hass)
 				response = await session.get(URL.format(config[CONF_LATITUDE], config[CONF_LONGITUDE]))
 
-				if response.status != HTTP_OK:
+				if response.status != HTTPStatus.OK:
 					raise ServiceUnavailable
 
 				text = await response.text()
