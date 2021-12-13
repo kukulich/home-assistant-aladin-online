@@ -9,11 +9,9 @@ from homeassistant.const import (
 	TEMP_CELSIUS,
 )
 from homeassistant.components.sensor import (
-	DEVICE_CLASS_HUMIDITY,
-	DEVICE_CLASS_PRESSURE,
-	DEVICE_CLASS_TEMPERATURE,
+	SensorDeviceClass,
 	SensorEntity,
-	STATE_CLASS_MEASUREMENT,
+	SensorStateClass,
 )
 from homeassistant.const import (
 	CONF_NAME,
@@ -71,10 +69,10 @@ SENSOR_NAMES: Final = {
 }
 
 SENSOR_DEVICE_CLASSES: Final = {
-	SENSOR_APPARENT_TEMPERATURE: DEVICE_CLASS_TEMPERATURE,
-	SENSOR_HUMIDITY: DEVICE_CLASS_HUMIDITY,
-	SENSOR_PRESSURE: DEVICE_CLASS_PRESSURE,
-	SENSOR_TEMPERATURE: DEVICE_CLASS_TEMPERATURE,
+	SENSOR_APPARENT_TEMPERATURE: SensorDeviceClass.TEMPERATURE,
+	SENSOR_HUMIDITY: SensorDeviceClass.HUMIDITY,
+	SENSOR_PRESSURE: SensorDeviceClass.PRESSURE,
+	SENSOR_TEMPERATURE: SensorDeviceClass.TEMPERATURE,
 }
 
 SENSOR_UNIT_OF_MEASUREMENTS: Final = {
@@ -136,7 +134,7 @@ class SensorEntity(CoordinatorEntity, SensorEntity):
 		)
 		self._attr_icon = SENSOR_ICONS[self._sensor_type] if self._sensor_type in SENSOR_ICONS else None
 		self._attr_native_unit_of_measurement = SENSOR_UNIT_OF_MEASUREMENTS[self._sensor_type] if self._sensor_type in SENSOR_UNIT_OF_MEASUREMENTS else None
-		self._attr_state_class = STATE_CLASS_MEASUREMENT
+		self._attr_state_class = SensorStateClass.MEASUREMENT
 
 		self._attr_device_class = SENSOR_DEVICE_CLASSES[self._sensor_type] if self._sensor_type in SENSOR_DEVICE_CLASSES else None
 		self._attr_device_info = DEVICE_INFO
