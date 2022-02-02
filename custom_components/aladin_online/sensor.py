@@ -142,6 +142,9 @@ class SensorEntity(CoordinatorEntity, SensorEntity):
 		self._update_attributes()
 
 	def _update_attributes(self):
+		if self.coordinator.data is None:
+			return
+
 		actual_weather: AladinActualWeather = self.coordinator.data.actual_weather
 
 		if self._sensor_type == SENSOR_APPARENT_TEMPERATURE:

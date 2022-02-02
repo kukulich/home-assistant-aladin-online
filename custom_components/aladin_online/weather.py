@@ -61,6 +61,9 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 		self._update_attributes()
 
 	def _update_attributes(self):
+		if self.coordinator.data is None:
+			return
+
 		actual_weather: AladinActualWeather = self.coordinator.data.actual_weather
 
 		self._attr_condition = actual_weather.condition
