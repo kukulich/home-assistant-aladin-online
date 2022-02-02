@@ -10,7 +10,7 @@ from homeassistant.const import (
 )
 from homeassistant.components.sensor import (
 	SensorDeviceClass,
-	SensorEntity,
+	SensorEntity as ComponentSensorEntity,
 	SensorStateClass,
 )
 from homeassistant.const import (
@@ -116,7 +116,7 @@ async def async_setup_entry(hass: core.HomeAssistant, config_entry: config_entri
 		])
 
 
-class SensorEntity(CoordinatorEntity, SensorEntity):
+class SensorEntity(CoordinatorEntity, ComponentSensorEntity):
 
 	def __init__(self, coordinator: DataUpdateCoordinator, config: MappingProxyType, sensor_type: str):
 		super().__init__(coordinator)
