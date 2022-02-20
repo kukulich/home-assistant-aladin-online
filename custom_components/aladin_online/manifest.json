@@ -7,5 +7,6 @@
 	"issue_tracker": "https://github.com/kukulich/home-assistant-weather-forecast-for-czech-republic/issues",
 	"dependencies": [],
 	"codeowners": ["@kukulich"],
-	"requirements": []
+	"requirements": [],
+	"iot_class": "cloud_polling"
 }
