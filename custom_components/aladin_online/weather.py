@@ -16,6 +16,7 @@ from homeassistant.const import (
 from homeassistant.core import callback
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
+from homeassistant.helpers.device_registry import DeviceEntryType
 from types import MappingProxyType
 from typing import Final
 from .aladin_online import AladinActualWeather
@@ -30,7 +31,7 @@ DEVICE_INFO: Final[DeviceInfo] = {
 	"model": "Weather forecast",
 	"default_name": "Weather forecast",
 	"manufacturer": NAME,
-	"entry_type": "service",
+	"entry_type": DeviceEntryType.SERVICE,
 }
 
 
