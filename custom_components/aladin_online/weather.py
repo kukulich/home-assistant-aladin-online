@@ -2,15 +2,18 @@ import datetime
 from homeassistant import config_entries, core
 from homeassistant.components.weather import (
 	ATTR_FORECAST_CONDITION,
-	ATTR_FORECAST_TEMP,
-	ATTR_FORECAST_PRECIPITATION,
+	ATTR_FORECAST_NATIVE_TEMP,
+	ATTR_FORECAST_NATIVE_PRECIPITATION,
+	ATTR_FORECAST_NATIVE_WIND_SPEED,
 	ATTR_FORECAST_TIME,
 	ATTR_FORECAST_WIND_BEARING,
-	ATTR_FORECAST_WIND_SPEED,
 	WeatherEntity as ComponentWeatherEntity,
 )
 from homeassistant.const import (
 	CONF_NAME,
+	LENGTH_MILLIMETERS,
+	PRESSURE_HPA,
+	SPEED_KILOMETERS_PER_HOUR,
 	TEMP_CELSIUS,
 )
 from homeassistant.core import callback
@@ -45,7 +48,10 @@ async def async_setup_entry(hass: core.HomeAssistant, config_entry: config_entri
 
 class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 
-	_attr_temperature_unit = TEMP_CELSIUS
+	_attr_native_precipitation_unit = LENGTH_MILLIMETERS
+	_attr_native_pressure_unit = PRESSURE_HPA
+	_attr_native_temperature_unit = TEMP_CELSIUS
+	_attr_native_wind_speed_unit = SPEED_KILOMETERS_PER_HOUR
 
 	def __init__(self, coordinator: DataUpdateCoordinator, config: MappingProxyType):
 		super().__init__(coordinator)
@@ -69,10 +75,10 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 
 		self._attr_condition = actual_weather.condition
 		self._attr_humidity = actual_weather.humidity
-		self._attr_pressure = actual_weather.pressure
-		self._attr_temperature = actual_weather.temperature
+		self._attr_native_pressure = actual_weather.pressure
+		self._attr_native_temperature = actual_weather.temperature
+		self._attr_native_wind_speed = actual_weather.wind_speed_in_kilometers_per_hour
 		self._attr_wind_bearing = actual_weather.wind_bearing
-		self._attr_wind_speed = actual_weather.wind_speed_in_kilometers_per_hour
 
 		now = datetime.datetime.now()
 
@@ -85,9 +91,9 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 			self._attr_forecast.append({
 				ATTR_FORECAST_TIME: hourly_forecast.datetime,
 				ATTR_FORECAST_CONDITION: hourly_forecast.condition,
-				ATTR_FORECAST_TEMP: hourly_forecast.temperature,
-				ATTR_FORECAST_PRECIPITATION: hourly_forecast.precipitation,
-				ATTR_FORECAST_WIND_SPEED: hourly_forecast.wind_speed_in_kilometers_per_hour,
+				ATTR_FORECAST_NATIVE_TEMP: hourly_forecast.temperature,
+				ATTR_FORECAST_NATIVE_PRECIPITATION: hourly_forecast.precipitation,
+				ATTR_FORECAST_NATIVE_WIND_SPEED: hourly_forecast.wind_speed_in_kilometers_per_hour,
 				ATTR_FORECAST_WIND_BEARING: hourly_forecast.wind_bearing,
 			})
 
