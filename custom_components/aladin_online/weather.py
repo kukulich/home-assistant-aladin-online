@@ -4,6 +4,7 @@ from homeassistant.components.weather import (
 	ATTR_FORECAST_CONDITION,
 	ATTR_FORECAST_NATIVE_TEMP,
 	ATTR_FORECAST_NATIVE_PRECIPITATION,
+	ATTR_FORECAST_NATIVE_PRESSURE,
 	ATTR_FORECAST_NATIVE_WIND_SPEED,
 	ATTR_FORECAST_TIME,
 	ATTR_FORECAST_WIND_BEARING,
@@ -93,6 +94,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 				ATTR_FORECAST_CONDITION: hourly_forecast.condition,
 				ATTR_FORECAST_NATIVE_TEMP: hourly_forecast.temperature,
 				ATTR_FORECAST_NATIVE_PRECIPITATION: hourly_forecast.precipitation,
+				ATTR_FORECAST_NATIVE_PRESSURE: hourly_forecast.pressure,
 				ATTR_FORECAST_NATIVE_WIND_SPEED: hourly_forecast.wind_speed_in_kilometers_per_hour,
 				ATTR_FORECAST_WIND_BEARING: hourly_forecast.wind_bearing,
 			})
