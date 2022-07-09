@@ -100,14 +100,6 @@ SENSOR_ICONS: Final = {
 	SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR: "mdi:weather-windy",
 }
 
-DEVICE_INFO: Final[DeviceInfo] = {
-	"identifiers": {(DOMAIN,)},
-	"model": "Weather forecast",
-	"default_name": "Weather forecast",
-	"manufacturer": NAME,
-	"entry_type": DeviceEntryType.SERVICE,
-}
-
 async def async_setup_entry(hass: core.HomeAssistant, config_entry: config_entries.ConfigEntry, async_add_entities) -> None:
 	coordinator = hass.data[DOMAIN][config_entry.entry_id][DATA_COORDINATOR]
 
@@ -119,6 +111,8 @@ async def async_setup_entry(hass: core.HomeAssistant, config_entry: config_entri
 
 class SensorEntity(CoordinatorEntity, ComponentSensorEntity):
 
+	_attr_has_entity_name = True
+
 	def __init__(self, coordinator: DataUpdateCoordinator, config: MappingProxyType, sensor_type: str):
 		super().__init__(coordinator)
 
@@ -129,16 +123,19 @@ class SensorEntity(CoordinatorEntity, ComponentSensorEntity):
 			self._sensor_type,
 		)
 
-		self._attr_name = "{}: {}".format(
-			config[CONF_NAME],
-			SENSOR_NAMES[self._sensor_type],
-		)
+		self._attr_name = SENSOR_NAMES[self._sensor_type]
 		self._attr_icon = SENSOR_ICONS[self._sensor_type] if self._sensor_type in SENSOR_ICONS else None
 		self._attr_native_unit_of_measurement = SENSOR_UNIT_OF_MEASUREMENTS[self._sensor_type] if self._sensor_type in SENSOR_UNIT_OF_MEASUREMENTS else None
 		self._attr_state_class = SensorStateClass.MEASUREMENT
 
 		self._attr_device_class = SENSOR_DEVICE_CLASSES[self._sensor_type] if self._sensor_type in SENSOR_DEVICE_CLASSES else None
-		self._attr_device_info = DEVICE_INFO
+		self._attr_device_info = DeviceInfo(
+			identifiers={(DOMAIN,)},
+			model="Weather forecast",
+			name=config[CONF_NAME],
+			manufacturer=NAME,
+			entry_type=DeviceEntryType.SERVICE,
+		)
 
 		self._update_attributes()
 
