@@ -11,6 +11,7 @@ from homeassistant.const import (
 from homeassistant.components.sensor import (
 	SensorDeviceClass,
 	SensorEntity as ComponentSensorEntity,
+	SensorEntityDescription,
 	SensorStateClass,
 )
 from homeassistant.const import (
@@ -21,7 +22,7 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 from homeassistant.helpers.device_registry import DeviceEntryType
 from types import MappingProxyType
-from typing import Final
+from typing import Dict, Final
 from .aladin_online import AladinActualWeather
 from .const import (
 	DOMAIN,
@@ -41,63 +42,84 @@ SENSOR_WIND_SPEED_IN_KILOMETERS_PER_HOUR: Final = "wind_speed_in_km_h"
 SENSOR_WIND_GUST_SPEED: Final = "wind_gust_speed"
 SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR: Final = "wind_gust_speed_in_km_h"
 
-SENSORS: Final = (
-	SENSOR_APPARENT_TEMPERATURE,
-	SENSOR_CLOUDS,
-	SENSOR_HUMIDITY,
-	SENSOR_PRECIPITATION,
-	SENSOR_PRESSURE,
-	SENSOR_SNOW_PRECIPITATION,
-	SENSOR_TEMPERATURE,
-	SENSOR_WIND_SPEED,
-	SENSOR_WIND_SPEED_IN_KILOMETERS_PER_HOUR,
-	SENSOR_WIND_GUST_SPEED,
-	SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR,
-)
-
-SENSOR_NAMES: Final = {
-	SENSOR_APPARENT_TEMPERATURE: "Apparent temperature",
-	SENSOR_CLOUDS: "Clouds",
-	SENSOR_HUMIDITY: "Humidity",
-	SENSOR_PRECIPITATION: "Precipitation",
-	SENSOR_PRESSURE: "Pressure",
-	SENSOR_SNOW_PRECIPITATION: "Snow precipitation",
-	SENSOR_TEMPERATURE: "Temperature",
-	SENSOR_WIND_SPEED: "Wind speed",
-	SENSOR_WIND_SPEED_IN_KILOMETERS_PER_HOUR: "Wind speed ({})".format(SPEED_KILOMETERS_PER_HOUR),
-	SENSOR_WIND_GUST_SPEED: "Wind gust speed",
-	SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR: "Wind gust speed ({})".format(SPEED_KILOMETERS_PER_HOUR),
-}
-
-SENSOR_DEVICE_CLASSES: Final = {
-	SENSOR_APPARENT_TEMPERATURE: SensorDeviceClass.TEMPERATURE,
-	SENSOR_HUMIDITY: SensorDeviceClass.HUMIDITY,
-	SENSOR_PRESSURE: SensorDeviceClass.PRESSURE,
-	SENSOR_TEMPERATURE: SensorDeviceClass.TEMPERATURE,
-}
-
-SENSOR_UNIT_OF_MEASUREMENTS: Final = {
-	SENSOR_APPARENT_TEMPERATURE: TEMP_CELSIUS,
-	SENSOR_CLOUDS: PERCENTAGE,
-	SENSOR_HUMIDITY: PERCENTAGE,
-	SENSOR_PRECIPITATION: PRECIPITATION_MILLIMETERS_PER_HOUR,
-	SENSOR_PRESSURE: PRESSURE_HPA,
-	SENSOR_SNOW_PRECIPITATION: PERCENTAGE,
-	SENSOR_TEMPERATURE: TEMP_CELSIUS,
-	SENSOR_WIND_SPEED: SPEED_METERS_PER_SECOND,
-	SENSOR_WIND_SPEED_IN_KILOMETERS_PER_HOUR: SPEED_KILOMETERS_PER_HOUR,
-	SENSOR_WIND_GUST_SPEED: SPEED_METERS_PER_SECOND,
-	SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR: SPEED_KILOMETERS_PER_HOUR,
-}
-
-SENSOR_ICONS: Final = {
-	SENSOR_CLOUDS: "mdi:weather-partly-cloudy",
-	SENSOR_PRECIPITATION: "mdi:cup-water",
-	SENSOR_SNOW_PRECIPITATION: "mdi:weather-snowy",
-	SENSOR_WIND_SPEED: "mdi:weather-windy",
-	SENSOR_WIND_SPEED_IN_KILOMETERS_PER_HOUR: "mdi:weather-windy",
-	SENSOR_WIND_GUST_SPEED: "mdi:weather-windy",
-	SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR: "mdi:weather-windy",
+SENSORS: Dict[str, SensorEntityDescription] = {
+	SENSOR_APPARENT_TEMPERATURE: SensorEntityDescription(
+		key=SENSOR_APPARENT_TEMPERATURE,
+		name="Apparent temperature",
+		device_class=SensorDeviceClass.TEMPERATURE,
+		native_unit_of_measurement=TEMP_CELSIUS,
+		state_class=SensorStateClass.MEASUREMENT,
+	),
+	SENSOR_CLOUDS: SensorEntityDescription(
+		key=SENSOR_CLOUDS,
+		name="Clouds",
+		icon="mdi:weather-partly-cloudy",
+		native_unit_of_measurement=PERCENTAGE,
+		state_class=SensorStateClass.MEASUREMENT,
+	),
+	SENSOR_HUMIDITY: SensorEntityDescription(
+		key=SENSOR_HUMIDITY,
+		name="Humidity",
+		device_class=SensorDeviceClass.HUMIDITY,
+		native_unit_of_measurement=PERCENTAGE,
+		state_class=SensorStateClass.MEASUREMENT,
+	),
+	SENSOR_PRECIPITATION: SensorEntityDescription(
+		key=SENSOR_PRECIPITATION,
+		name="Precipitation",
+		icon="mdi:cup-water",
+		native_unit_of_measurement=PRECIPITATION_MILLIMETERS_PER_HOUR,
+		state_class=SensorStateClass.MEASUREMENT,
+	),
+	SENSOR_PRESSURE: SensorEntityDescription(
+		key=SENSOR_PRESSURE,
+		name="Pressure",
+		device_class=SensorDeviceClass.PRESSURE,
+		native_unit_of_measurement=PRESSURE_HPA,
+		state_class=SensorStateClass.MEASUREMENT,
+	),
+	SENSOR_SNOW_PRECIPITATION: SensorEntityDescription(
+		key=SENSOR_SNOW_PRECIPITATION,
+		name="Snow precipitation",
+		icon="mdi:weather-snowy",
+		native_unit_of_measurement=PERCENTAGE,
+		state_class=SensorStateClass.MEASUREMENT,
+	),
+	SENSOR_TEMPERATURE: SensorEntityDescription(
+		key=SENSOR_TEMPERATURE,
+		name="Temperature",
+		device_class=SensorDeviceClass.TEMPERATURE,
+		native_unit_of_measurement=TEMP_CELSIUS,
+		state_class=SensorStateClass.MEASUREMENT,
+	),
+	SENSOR_WIND_SPEED: SensorEntityDescription(
+		key=SENSOR_WIND_SPEED,
+		name="Wind speed",
+		icon="mdi:weather-windy",
+		native_unit_of_measurement=SPEED_METERS_PER_SECOND,
+		state_class=SensorStateClass.MEASUREMENT,
+	),
+	SENSOR_WIND_SPEED_IN_KILOMETERS_PER_HOUR: SensorEntityDescription(
+		key=SENSOR_WIND_SPEED_IN_KILOMETERS_PER_HOUR,
+		name="Wind speed ({})".format(SPEED_KILOMETERS_PER_HOUR),
+		icon="mdi:weather-windy",
+		native_unit_of_measurement=SPEED_KILOMETERS_PER_HOUR,
+		state_class=SensorStateClass.MEASUREMENT,
+	),
+	SENSOR_WIND_GUST_SPEED: SensorEntityDescription(
+		key=SENSOR_WIND_GUST_SPEED,
+		name="Wind gust speed",
+		icon="mdi:weather-windy",
+		native_unit_of_measurement=SPEED_METERS_PER_SECOND,
+		state_class=SensorStateClass.MEASUREMENT,
+	),
+	SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR: SensorEntityDescription(
+		key=SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR,
+		name="Wind gust speed ({})".format(SPEED_KILOMETERS_PER_HOUR),
+		icon="mdi:weather-windy",
+		native_unit_of_measurement=SPEED_KILOMETERS_PER_HOUR,
+		state_class=SensorStateClass.MEASUREMENT,
+	),
 }
 
 async def async_setup_entry(hass: core.HomeAssistant, config_entry: config_entries.ConfigEntry, async_add_entities) -> None:
@@ -105,7 +127,7 @@ async def async_setup_entry(hass: core.HomeAssistant, config_entry: config_entri
 
 	for sensor_type in SENSORS:
 		async_add_entities([
-			SensorEntity(coordinator, config_entry.data, sensor_type),
+			SensorEntity(coordinator, config_entry.data, sensor_type, SENSORS[sensor_type]),
 		])
 
 
@@ -113,22 +135,17 @@ class SensorEntity(CoordinatorEntity, ComponentSensorEntity):
 
 	_attr_has_entity_name = True
 
-	def __init__(self, coordinator: DataUpdateCoordinator, config: MappingProxyType, sensor_type: str):
+	def __init__(self, coordinator: DataUpdateCoordinator, config: MappingProxyType, sensor_type: str, entity_description: SensorEntityDescription):
 		super().__init__(coordinator)
 
 		self._sensor_type: str = sensor_type
+		self.entity_description = entity_description
 
 		self._attr_unique_id = "{}.{}".format(
 			config[CONF_NAME],
 			self._sensor_type,
 		)
 
-		self._attr_name = SENSOR_NAMES[self._sensor_type]
-		self._attr_icon = SENSOR_ICONS[self._sensor_type] if self._sensor_type in SENSOR_ICONS else None
-		self._attr_native_unit_of_measurement = SENSOR_UNIT_OF_MEASUREMENTS[self._sensor_type] if self._sensor_type in SENSOR_UNIT_OF_MEASUREMENTS else None
-		self._attr_state_class = SensorStateClass.MEASUREMENT
-
-		self._attr_device_class = SENSOR_DEVICE_CLASSES[self._sensor_type] if self._sensor_type in SENSOR_DEVICE_CLASSES else None
 		self._attr_device_info = DeviceInfo(
 			identifiers={(DOMAIN,)},
 			model="Weather forecast",
