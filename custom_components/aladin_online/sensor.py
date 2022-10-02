@@ -4,7 +4,6 @@ from homeassistant.const import (
 	PERCENTAGE,
 	PRECIPITATION_MILLIMETERS_PER_HOUR,
 	PRESSURE_HPA,
-	SPEED_KILOMETERS_PER_HOUR,
 	SPEED_METERS_PER_SECOND,
 	TEMP_CELSIUS,
 )
@@ -38,9 +37,7 @@ SENSOR_PRESSURE: Final = "pressure"
 SENSOR_SNOW_PRECIPITATION: Final = "snow_precipitation"
 SENSOR_TEMPERATURE: Final = "temperature"
 SENSOR_WIND_SPEED: Final = "wind_speed"
-SENSOR_WIND_SPEED_IN_KILOMETERS_PER_HOUR: Final = "wind_speed_in_km_h"
 SENSOR_WIND_GUST_SPEED: Final = "wind_gust_speed"
-SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR: Final = "wind_gust_speed_in_km_h"
 
 SENSORS: Dict[str, SensorEntityDescription] = {
 	SENSOR_APPARENT_TEMPERATURE: SensorEntityDescription(
@@ -99,25 +96,11 @@ SENSORS: Dict[str, SensorEntityDescription] = {
 		native_unit_of_measurement=SPEED_METERS_PER_SECOND,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
-	SENSOR_WIND_SPEED_IN_KILOMETERS_PER_HOUR: SensorEntityDescription(
-		key=SENSOR_WIND_SPEED_IN_KILOMETERS_PER_HOUR,
-		name="Wind speed ({})".format(SPEED_KILOMETERS_PER_HOUR),
-		icon="mdi:weather-windy",
-		native_unit_of_measurement=SPEED_KILOMETERS_PER_HOUR,
-		state_class=SensorStateClass.MEASUREMENT,
-	),
 	SENSOR_WIND_GUST_SPEED: SensorEntityDescription(
 		key=SENSOR_WIND_GUST_SPEED,
 		name="Wind gust speed",
 		icon="mdi:weather-windy",
 		native_unit_of_measurement=SPEED_METERS_PER_SECOND,
-		state_class=SensorStateClass.MEASUREMENT,
-	),
-	SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR: SensorEntityDescription(
-		key=SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR,
-		name="Wind gust speed ({})".format(SPEED_KILOMETERS_PER_HOUR),
-		icon="mdi:weather-windy",
-		native_unit_of_measurement=SPEED_KILOMETERS_PER_HOUR,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
 }
@@ -178,12 +161,8 @@ class SensorEntity(CoordinatorEntity, ComponentSensorEntity):
 			self._attr_native_value = actual_weather.temperature
 		elif self._sensor_type == SENSOR_WIND_SPEED:
 			self._attr_native_value = actual_weather.wind_speed
-		elif self._sensor_type == SENSOR_WIND_SPEED_IN_KILOMETERS_PER_HOUR:
-			self._attr_native_value = actual_weather.wind_speed_in_kilometers_per_hour
 		elif self._sensor_type == SENSOR_WIND_GUST_SPEED:
 			self._attr_native_value = actual_weather.wind_gust_speed
-		elif self._sensor_type == SENSOR_WIND_GUST_SPEED_IN_KILOMETERS_PER_HOUR:
-			self._attr_native_value = actual_weather.wind_gust_speed_in_kilometers_per_hour
 
 	@callback
 	def _handle_coordinator_update(self) -> None:

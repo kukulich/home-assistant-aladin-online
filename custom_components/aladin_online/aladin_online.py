@@ -75,14 +75,6 @@ class AladinActualWeather:
 		self.wind_gust_bearing = wind_gust_bearing
 		self.snow_precipitation = snow_precipitation
 
-	@property
-	def wind_speed_in_kilometers_per_hour(self) -> float:
-		return round(self.wind_speed * 3.6, 1)
-
-	@property
-	def wind_gust_speed_in_kilometers_per_hour(self) -> float:
-		return round(self.wind_gust_speed * 3.6, 1)
-
 
 class AladinWeatherForecast:
 

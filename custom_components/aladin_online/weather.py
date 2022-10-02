@@ -14,7 +14,7 @@ from homeassistant.const import (
 	CONF_NAME,
 	LENGTH_MILLIMETERS,
 	PRESSURE_HPA,
-	SPEED_KILOMETERS_PER_HOUR,
+	SPEED_METERS_PER_SECOND,
 	TEMP_CELSIUS,
 )
 from homeassistant.core import callback
@@ -43,7 +43,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 	_attr_native_precipitation_unit = LENGTH_MILLIMETERS
 	_attr_native_pressure_unit = PRESSURE_HPA
 	_attr_native_temperature_unit = TEMP_CELSIUS
-	_attr_native_wind_speed_unit = SPEED_KILOMETERS_PER_HOUR
+	_attr_native_wind_speed_unit = SPEED_METERS_PER_SECOND
 
 	def __init__(self, coordinator: DataUpdateCoordinator, config: MappingProxyType):
 		super().__init__(coordinator)
@@ -73,7 +73,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 		self._attr_humidity = actual_weather.humidity
 		self._attr_native_pressure = actual_weather.pressure
 		self._attr_native_temperature = actual_weather.temperature
-		self._attr_native_wind_speed = actual_weather.wind_speed_in_kilometers_per_hour
+		self._attr_native_wind_speed = actual_weather.wind_speed
 		self._attr_wind_bearing = actual_weather.wind_bearing
 
 		now = datetime.datetime.now()
@@ -90,7 +90,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 				ATTR_FORECAST_NATIVE_TEMP: hourly_forecast.temperature,
 				ATTR_FORECAST_NATIVE_PRECIPITATION: hourly_forecast.precipitation,
 				ATTR_FORECAST_NATIVE_PRESSURE: hourly_forecast.pressure,
-				ATTR_FORECAST_NATIVE_WIND_SPEED: hourly_forecast.wind_speed_in_kilometers_per_hour,
+				ATTR_FORECAST_NATIVE_WIND_SPEED: hourly_forecast.wind_speed,
 				ATTR_FORECAST_WIND_BEARING: hourly_forecast.wind_bearing,
 			})
 
