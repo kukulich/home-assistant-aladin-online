@@ -64,7 +64,7 @@ SENSORS: Dict[str, SensorEntityDescription] = {
 	SENSOR_PRECIPITATION: SensorEntityDescription(
 		key=SENSOR_PRECIPITATION,
 		name="Precipitation",
-		icon="mdi:cup-water",
+		device_class=SensorDeviceClass.PRECIPITATION_INTENSITY,
 		native_unit_of_measurement=PRECIPITATION_MILLIMETERS_PER_HOUR,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
