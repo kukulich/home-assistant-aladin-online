@@ -1,5 +1,12 @@
 import datetime
 from homeassistant import config_entries, core
+from homeassistant.const import (
+	CONF_NAME,
+	UnitOfLength,
+	UnitOfPressure,
+	UnitOfSpeed,
+	UnitOfTemperature,
+)
 from homeassistant.components.weather import (
 	ATTR_FORECAST_CONDITION,
 	ATTR_FORECAST_NATIVE_TEMP,
@@ -9,13 +16,6 @@ from homeassistant.components.weather import (
 	ATTR_FORECAST_TIME,
 	ATTR_FORECAST_WIND_BEARING,
 	WeatherEntity as ComponentWeatherEntity,
-)
-from homeassistant.const import (
-	CONF_NAME,
-	LENGTH_MILLIMETERS,
-	PRESSURE_HPA,
-	SPEED_METERS_PER_SECOND,
-	TEMP_CELSIUS,
 )
 from homeassistant.core import callback
 from homeassistant.helpers.entity import DeviceInfo
@@ -40,10 +40,10 @@ async def async_setup_entry(hass: core.HomeAssistant, config_entry: config_entri
 class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 
 	_attr_has_entity_name = True
-	_attr_native_precipitation_unit = LENGTH_MILLIMETERS
-	_attr_native_pressure_unit = PRESSURE_HPA
-	_attr_native_temperature_unit = TEMP_CELSIUS
-	_attr_native_wind_speed_unit = SPEED_METERS_PER_SECOND
+	_attr_native_precipitation_unit = UnitOfLength.MILLIMETERS
+	_attr_native_pressure_unit = UnitOfPressure.HPA
+	_attr_native_temperature_unit = UnitOfTemperature.CELSIUS
+	_attr_native_wind_speed_unit = UnitOfSpeed.METERS_PER_SECOND
 
 	def __init__(self, coordinator: DataUpdateCoordinator, config: MappingProxyType):
 		super().__init__(coordinator)

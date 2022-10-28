@@ -2,10 +2,10 @@ from __future__ import annotations
 from homeassistant import config_entries, core
 from homeassistant.const import (
 	PERCENTAGE,
-	PRECIPITATION_MILLIMETERS_PER_HOUR,
-	PRESSURE_HPA,
-	SPEED_METERS_PER_SECOND,
-	TEMP_CELSIUS,
+	UnitOfPressure,
+	UnitOfSpeed,
+	UnitOfTemperature,
+	UnitOfVolumetricFlux,
 )
 from homeassistant.components.sensor import (
 	SensorDeviceClass,
@@ -44,7 +44,7 @@ SENSORS: Dict[str, SensorEntityDescription] = {
 		key=SENSOR_APPARENT_TEMPERATURE,
 		name="Apparent temperature",
 		device_class=SensorDeviceClass.TEMPERATURE,
-		native_unit_of_measurement=TEMP_CELSIUS,
+		native_unit_of_measurement=UnitOfTemperature.CELSIUS,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
 	SENSOR_CLOUDS: SensorEntityDescription(
@@ -65,14 +65,14 @@ SENSORS: Dict[str, SensorEntityDescription] = {
 		key=SENSOR_PRECIPITATION,
 		name="Precipitation",
 		device_class=SensorDeviceClass.PRECIPITATION_INTENSITY,
-		native_unit_of_measurement=PRECIPITATION_MILLIMETERS_PER_HOUR,
+		native_unit_of_measurement=UnitOfVolumetricFlux.MILLIMETERS_PER_HOUR,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
 	SENSOR_PRESSURE: SensorEntityDescription(
 		key=SENSOR_PRESSURE,
 		name="Pressure",
 		device_class=SensorDeviceClass.PRESSURE,
-		native_unit_of_measurement=PRESSURE_HPA,
+		native_unit_of_measurement=UnitOfPressure.HPA,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
 	SENSOR_SNOW_PRECIPITATION: SensorEntityDescription(
@@ -86,21 +86,21 @@ SENSORS: Dict[str, SensorEntityDescription] = {
 		key=SENSOR_TEMPERATURE,
 		name="Temperature",
 		device_class=SensorDeviceClass.TEMPERATURE,
-		native_unit_of_measurement=TEMP_CELSIUS,
+		native_unit_of_measurement=UnitOfTemperature.CELSIUS,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
 	SENSOR_WIND_SPEED: SensorEntityDescription(
 		key=SENSOR_WIND_SPEED,
 		name="Wind speed",
 		device_class=SensorDeviceClass.WIND_SPEED,
-		native_unit_of_measurement=SPEED_METERS_PER_SECOND,
+		native_unit_of_measurement=UnitOfSpeed.METERS_PER_SECOND,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
 	SENSOR_WIND_GUST_SPEED: SensorEntityDescription(
 		key=SENSOR_WIND_GUST_SPEED,
 		name="Wind gust speed",
 		device_class=SensorDeviceClass.WIND_SPEED,
-		native_unit_of_measurement=SPEED_METERS_PER_SECOND,
+		native_unit_of_measurement=UnitOfSpeed.METERS_PER_SECOND,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
 }
