@@ -92,16 +92,14 @@ SENSORS: Dict[str, SensorEntityDescription] = {
 	SENSOR_WIND_SPEED: SensorEntityDescription(
 		key=SENSOR_WIND_SPEED,
 		name="Wind speed",
-		icon="mdi:weather-windy",
-		device_class=SensorDeviceClass.SPEED,
+		device_class=SensorDeviceClass.WIND_SPEED,
 		native_unit_of_measurement=SPEED_METERS_PER_SECOND,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
 	SENSOR_WIND_GUST_SPEED: SensorEntityDescription(
 		key=SENSOR_WIND_GUST_SPEED,
 		name="Wind gust speed",
-		icon="mdi:weather-windy",
-		device_class=SensorDeviceClass.SPEED,
+		device_class=SensorDeviceClass.WIND_SPEED,
 		native_unit_of_measurement=SPEED_METERS_PER_SECOND,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
