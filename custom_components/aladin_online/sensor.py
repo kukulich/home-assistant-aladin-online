@@ -71,7 +71,7 @@ SENSORS: Dict[str, SensorEntityDescription] = {
 	SENSOR_PRESSURE: SensorEntityDescription(
 		key=SENSOR_PRESSURE,
 		name="Pressure",
-		device_class=SensorDeviceClass.PRESSURE,
+		device_class=SensorDeviceClass.ATMOSPHERIC_PRESSURE,
 		native_unit_of_measurement=UnitOfPressure.HPA,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
