@@ -218,24 +218,24 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 
 	@staticmethod
 	def _format_temperature(raw: float) -> float:
-		return round(raw, 1)
+		return raw
 
 	@staticmethod
 	def _format_percent(raw: float) -> float:
-		return round(raw * 100)
+		return raw * 100
 
 	@staticmethod
 	def _format_precipitation(raw: float) -> float:
-		return abs(round(raw, 1))
+		return abs(raw)
 
 	@staticmethod
 	def _format_pressure(raw: float) -> float:
-		return round(raw / 100, 1)
+		return raw / 100
 
 	@staticmethod
 	def _format_wind_speed(raw: float) -> float:
-		return round(raw, 1)
+		return raw
 
 	@staticmethod
 	def _format_wind_direction(raw: float) -> float:
-		return round(raw / 100, 2)
+		return raw / 100

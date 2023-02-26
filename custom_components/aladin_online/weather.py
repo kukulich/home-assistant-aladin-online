@@ -70,11 +70,11 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 		actual_weather: AladinActualWeather = self.coordinator.data.actual_weather
 
 		self._attr_condition = actual_weather.condition
-		self._attr_humidity = actual_weather.humidity
-		self._attr_native_pressure = actual_weather.pressure
-		self._attr_native_temperature = actual_weather.temperature
-		self._attr_native_wind_speed = actual_weather.wind_speed
-		self._attr_wind_bearing = actual_weather.wind_bearing
+		self._attr_humidity = round(actual_weather.humidity, 1)
+		self._attr_native_pressure = round(actual_weather.pressure, 1)
+		self._attr_native_temperature = round(actual_weather.temperature, 1)
+		self._attr_native_wind_speed = round(actual_weather.wind_speed, 1)
+		self._attr_wind_bearing = round(actual_weather.wind_bearing, 2)
 
 		now = datetime.datetime.now()
 
@@ -87,11 +87,11 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 			self._attr_forecast.append({
 				ATTR_FORECAST_TIME: hourly_forecast.datetime,
 				ATTR_FORECAST_CONDITION: hourly_forecast.condition,
-				ATTR_FORECAST_NATIVE_TEMP: hourly_forecast.temperature,
-				ATTR_FORECAST_NATIVE_PRECIPITATION: hourly_forecast.precipitation,
-				ATTR_FORECAST_NATIVE_PRESSURE: hourly_forecast.pressure,
-				ATTR_FORECAST_NATIVE_WIND_SPEED: hourly_forecast.wind_speed,
-				ATTR_FORECAST_WIND_BEARING: hourly_forecast.wind_bearing,
+				ATTR_FORECAST_NATIVE_TEMP: round(hourly_forecast.temperature, 1),
+				ATTR_FORECAST_NATIVE_PRECIPITATION: round(hourly_forecast.precipitation, 1),
+				ATTR_FORECAST_NATIVE_PRESSURE: round(hourly_forecast.pressure, 1),
+				ATTR_FORECAST_NATIVE_WIND_SPEED: round(hourly_forecast.wind_speed, 1),
+				ATTR_FORECAST_WIND_BEARING: round(hourly_forecast.wind_bearing, 2),
 			})
 
 	@callback

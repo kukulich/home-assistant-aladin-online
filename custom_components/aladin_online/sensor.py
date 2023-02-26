@@ -45,6 +45,7 @@ SENSORS: Dict[str, SensorEntityDescription] = {
 		name="Apparent temperature",
 		device_class=SensorDeviceClass.TEMPERATURE,
 		native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
 	SENSOR_CLOUDS: SensorEntityDescription(
@@ -52,6 +53,7 @@ SENSORS: Dict[str, SensorEntityDescription] = {
 		name="Clouds",
 		icon="mdi:weather-partly-cloudy",
 		native_unit_of_measurement=PERCENTAGE,
+		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
 	SENSOR_HUMIDITY: SensorEntityDescription(
@@ -59,6 +61,7 @@ SENSORS: Dict[str, SensorEntityDescription] = {
 		name="Humidity",
 		device_class=SensorDeviceClass.HUMIDITY,
 		native_unit_of_measurement=PERCENTAGE,
+		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
 	SENSOR_PRECIPITATION: SensorEntityDescription(
@@ -66,6 +69,7 @@ SENSORS: Dict[str, SensorEntityDescription] = {
 		name="Precipitation",
 		device_class=SensorDeviceClass.PRECIPITATION_INTENSITY,
 		native_unit_of_measurement=UnitOfVolumetricFlux.MILLIMETERS_PER_HOUR,
+		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
 	SENSOR_PRESSURE: SensorEntityDescription(
@@ -73,6 +77,7 @@ SENSORS: Dict[str, SensorEntityDescription] = {
 		name="Pressure",
 		device_class=SensorDeviceClass.ATMOSPHERIC_PRESSURE,
 		native_unit_of_measurement=UnitOfPressure.HPA,
+		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
 	SENSOR_SNOW_PRECIPITATION: SensorEntityDescription(
@@ -80,6 +85,7 @@ SENSORS: Dict[str, SensorEntityDescription] = {
 		name="Snow precipitation",
 		icon="mdi:weather-snowy",
 		native_unit_of_measurement=PERCENTAGE,
+		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
 	SENSOR_TEMPERATURE: SensorEntityDescription(
@@ -87,6 +93,7 @@ SENSORS: Dict[str, SensorEntityDescription] = {
 		name="Temperature",
 		device_class=SensorDeviceClass.TEMPERATURE,
 		native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
 	SENSOR_WIND_SPEED: SensorEntityDescription(
@@ -94,6 +101,7 @@ SENSORS: Dict[str, SensorEntityDescription] = {
 		name="Wind speed",
 		device_class=SensorDeviceClass.WIND_SPEED,
 		native_unit_of_measurement=UnitOfSpeed.METERS_PER_SECOND,
+		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
 	SENSOR_WIND_GUST_SPEED: SensorEntityDescription(
@@ -101,6 +109,7 @@ SENSORS: Dict[str, SensorEntityDescription] = {
 		name="Wind gust speed",
 		device_class=SensorDeviceClass.WIND_SPEED,
 		native_unit_of_measurement=UnitOfSpeed.METERS_PER_SECOND,
+		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
 	),
 }
