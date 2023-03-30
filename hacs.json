@@ -3,7 +3,7 @@
 	"content_in_root": false,
 	"domains": ["sensor", "weather"],
 	"country": ["CS", "EN"],
-	"homeassistant": "2023.3.0",
+	"homeassistant": "2023.4.0",
 	"render_readme": true
 }
 
