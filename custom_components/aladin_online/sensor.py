@@ -50,7 +50,6 @@ class SensorEntityDescription(ComponentSensorEntityDescription):
 SENSORS: Dict[SensorType, SensorEntityDescription] = {
 	SensorType.APPARENT_TEMPERATURE: SensorEntityDescription(
 		key=SensorType.APPARENT_TEMPERATURE,
-		name="Apparent temperature",
 		device_class=SensorDeviceClass.TEMPERATURE,
 		native_unit_of_measurement=UnitOfTemperature.CELSIUS,
 		suggested_display_precision=1,
@@ -59,7 +58,6 @@ SENSORS: Dict[SensorType, SensorEntityDescription] = {
 	),
 	SensorType.CLOUDS: SensorEntityDescription(
 		key=SensorType.CLOUDS,
-		name="Clouds",
 		icon="mdi:weather-partly-cloudy",
 		native_unit_of_measurement=PERCENTAGE,
 		suggested_display_precision=1,
@@ -68,7 +66,6 @@ SENSORS: Dict[SensorType, SensorEntityDescription] = {
 	),
 	SensorType.HUMIDITY: SensorEntityDescription(
 		key=SensorType.HUMIDITY,
-		name="Humidity",
 		device_class=SensorDeviceClass.HUMIDITY,
 		native_unit_of_measurement=PERCENTAGE,
 		suggested_display_precision=1,
@@ -77,7 +74,6 @@ SENSORS: Dict[SensorType, SensorEntityDescription] = {
 	),
 	SensorType.PRECIPITATION: SensorEntityDescription(
 		key=SensorType.PRECIPITATION,
-		name="Precipitation",
 		device_class=SensorDeviceClass.PRECIPITATION_INTENSITY,
 		native_unit_of_measurement=UnitOfVolumetricFlux.MILLIMETERS_PER_HOUR,
 		suggested_display_precision=1,
@@ -86,7 +82,6 @@ SENSORS: Dict[SensorType, SensorEntityDescription] = {
 	),
 	SensorType.PRESSURE: SensorEntityDescription(
 		key=SensorType.PRESSURE,
-		name="Pressure",
 		device_class=SensorDeviceClass.ATMOSPHERIC_PRESSURE,
 		native_unit_of_measurement=UnitOfPressure.HPA,
 		suggested_display_precision=1,
@@ -95,7 +90,6 @@ SENSORS: Dict[SensorType, SensorEntityDescription] = {
 	),
 	SensorType.SNOW_PRECIPITATION: SensorEntityDescription(
 		key=SensorType.SNOW_PRECIPITATION,
-		name="Snow precipitation",
 		icon="mdi:weather-snowy",
 		native_unit_of_measurement=PERCENTAGE,
 		suggested_display_precision=1,
@@ -104,7 +98,6 @@ SENSORS: Dict[SensorType, SensorEntityDescription] = {
 	),
 	SensorType.TEMPERATURE: SensorEntityDescription(
 		key=SensorType.TEMPERATURE,
-		name="Temperature",
 		device_class=SensorDeviceClass.TEMPERATURE,
 		native_unit_of_measurement=UnitOfTemperature.CELSIUS,
 		suggested_display_precision=1,
@@ -113,7 +106,6 @@ SENSORS: Dict[SensorType, SensorEntityDescription] = {
 	),
 	SensorType.WIND_SPEED: SensorEntityDescription(
 		key=SensorType.WIND_SPEED,
-		name="Wind speed",
 		device_class=SensorDeviceClass.WIND_SPEED,
 		native_unit_of_measurement=UnitOfSpeed.METERS_PER_SECOND,
 		suggested_display_precision=1,
@@ -122,7 +114,6 @@ SENSORS: Dict[SensorType, SensorEntityDescription] = {
 	),
 	SensorType.WIND_GUST_SPEED: SensorEntityDescription(
 		key=SensorType.WIND_GUST_SPEED,
-		name="Wind gust speed",
 		device_class=SensorDeviceClass.WIND_SPEED,
 		native_unit_of_measurement=UnitOfSpeed.METERS_PER_SECOND,
 		suggested_display_precision=1,
@@ -150,6 +141,7 @@ class SensorEntity(CoordinatorEntity, ComponentSensorEntity):
 		super().__init__(coordinator)
 
 		self.entity_description = entity_description
+		self._attr_translation_key = entity_description.key
 
 		self._attr_unique_id = "{}.{}".format(
 			config[CONF_NAME],

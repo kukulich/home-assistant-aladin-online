@@ -15,5 +15,36 @@
 			"service_unavailable": "Service is not available.",
 			"location_unavailable": "Location is not available."
 		}
+	},
+	"entity": {
+		"sensor": {
+			"apparent_temperature": {
+				"name": "Apparent temperature"
+			},
+			"clouds": {
+				"name": "Clouds"
+			},
+			"humidity": {
+				"name": "Humidity"
+			},
+			"precipitation": {
+				"name": "Precipitation intensity"
+			},
+			"pressure": {
+				"name": "Pressure"
+			},
+			"snow_precipitation": {
+				"name": "Snow precipitation"
+			},
+			"temperature": {
+				"name": "Temperature"
+			},
+			"wind_speed": {
+				"name": "Wind speed"
+			},
+			"wind_gust_speed": {
+				"name": "Wind gust speed"
+			}
+		}
 	}
 }

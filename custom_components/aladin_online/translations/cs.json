@@ -15,5 +15,35 @@
 			"service_unavailable": "Služba není dostupná.",
 			"location_unavailable": "Lokace není dostupná."
 		}
-	}
-}
+	},
+	"entity": {
+		"sensor": {
+			"apparent_temperature": {
+				"name": "Pocitová teplota"
+			},
+			"clouds": {
+				"name": "Oblačnost"
+			},
+			"humidity": {
+				"name": "Vlhkost"
+			},
+			"precipitation": {
+				"name": "Intenzita srážek"
+			},
+			"pressure": {
+				"name": "Tlak"
+			},
+			"snow_precipitation": {
+				"name": "Sněžení"
+			},
+			"temperature": {
+				"name": "Teplota"
+			},
+			"wind_speed": {
+				"name": "Rychlost větru"
+			},
+			"wind_gust_speed": {
+				"name": "Nárazová rychlost větru"
+			}
+		}
+	}}
