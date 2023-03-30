@@ -1,5 +1,8 @@
 from __future__ import annotations
+from collections.abc import Callable
+from dataclasses import dataclass
 from homeassistant import config_entries, core
+from homeassistant.backports.enum import StrEnum
 from homeassistant.const import (
 	PERCENTAGE,
 	UnitOfPressure,
@@ -10,7 +13,7 @@ from homeassistant.const import (
 from homeassistant.components.sensor import (
 	SensorDeviceClass,
 	SensorEntity as ComponentSensorEntity,
-	SensorEntityDescription,
+	SensorEntityDescription as ComponentSensorEntityDescription,
 	SensorStateClass,
 )
 from homeassistant.const import (
@@ -21,7 +24,7 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 from homeassistant.helpers.device_registry import DeviceEntryType
 from types import MappingProxyType
-from typing import Dict, Final
+from typing import Dict
 from .aladin_online import AladinActualWeather
 from .const import (
 	DOMAIN,
@@ -29,88 +32,102 @@ from .const import (
 	NAME,
 )
 
-SENSOR_APPARENT_TEMPERATURE: Final = "apparent_temperature"
-SENSOR_CLOUDS: Final = "clouds"
-SENSOR_HUMIDITY: Final = "humidity"
-SENSOR_PRECIPITATION: Final = "precipitation"
-SENSOR_PRESSURE: Final = "pressure"
-SENSOR_SNOW_PRECIPITATION: Final = "snow_precipitation"
-SENSOR_TEMPERATURE: Final = "temperature"
-SENSOR_WIND_SPEED: Final = "wind_speed"
-SENSOR_WIND_GUST_SPEED: Final = "wind_gust_speed"
+class SensorType(StrEnum):
+	APPARENT_TEMPERATURE = "apparent_temperature"
+	CLOUDS = "clouds"
+	HUMIDITY = "humidity"
+	PRECIPITATION = "precipitation"
+	PRESSURE = "pressure"
+	SNOW_PRECIPITATION = "snow_precipitation"
+	TEMPERATURE = "temperature"
+	WIND_SPEED = "wind_speed"
+	WIND_GUST_SPEED = "wind_gust_speed"
 
-SENSORS: Dict[str, SensorEntityDescription] = {
-	SENSOR_APPARENT_TEMPERATURE: SensorEntityDescription(
-		key=SENSOR_APPARENT_TEMPERATURE,
+@dataclass
+class SensorEntityDescription(ComponentSensorEntityDescription):
+	value_func: Callable | None = None
+
+SENSORS: Dict[SensorType, SensorEntityDescription] = {
+	SensorType.APPARENT_TEMPERATURE: SensorEntityDescription(
+		key=SensorType.APPARENT_TEMPERATURE,
 		name="Apparent temperature",
 		device_class=SensorDeviceClass.TEMPERATURE,
 		native_unit_of_measurement=UnitOfTemperature.CELSIUS,
 		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
+		value_func=lambda actual_weather: actual_weather.apparent_temperature,
 	),
-	SENSOR_CLOUDS: SensorEntityDescription(
-		key=SENSOR_CLOUDS,
+	SensorType.CLOUDS: SensorEntityDescription(
+		key=SensorType.CLOUDS,
 		name="Clouds",
 		icon="mdi:weather-partly-cloudy",
 		native_unit_of_measurement=PERCENTAGE,
 		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
+		value_func=lambda actual_weather: actual_weather.clouds,
 	),
-	SENSOR_HUMIDITY: SensorEntityDescription(
-		key=SENSOR_HUMIDITY,
+	SensorType.HUMIDITY: SensorEntityDescription(
+		key=SensorType.HUMIDITY,
 		name="Humidity",
 		device_class=SensorDeviceClass.HUMIDITY,
 		native_unit_of_measurement=PERCENTAGE,
 		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
+		value_func=lambda actual_weather: actual_weather.humidity,
 	),
-	SENSOR_PRECIPITATION: SensorEntityDescription(
-		key=SENSOR_PRECIPITATION,
+	SensorType.PRECIPITATION: SensorEntityDescription(
+		key=SensorType.PRECIPITATION,
 		name="Precipitation",
 		device_class=SensorDeviceClass.PRECIPITATION_INTENSITY,
 		native_unit_of_measurement=UnitOfVolumetricFlux.MILLIMETERS_PER_HOUR,
 		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
+		value_func=lambda actual_weather: actual_weather.precipitation,
 	),
-	SENSOR_PRESSURE: SensorEntityDescription(
-		key=SENSOR_PRESSURE,
+	SensorType.PRESSURE: SensorEntityDescription(
+		key=SensorType.PRESSURE,
 		name="Pressure",
 		device_class=SensorDeviceClass.ATMOSPHERIC_PRESSURE,
 		native_unit_of_measurement=UnitOfPressure.HPA,
 		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
+		value_func=lambda actual_weather: actual_weather.pressure,
 	),
-	SENSOR_SNOW_PRECIPITATION: SensorEntityDescription(
-		key=SENSOR_SNOW_PRECIPITATION,
+	SensorType.SNOW_PRECIPITATION: SensorEntityDescription(
+		key=SensorType.SNOW_PRECIPITATION,
 		name="Snow precipitation",
 		icon="mdi:weather-snowy",
 		native_unit_of_measurement=PERCENTAGE,
 		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
+		value_func=lambda actual_weather: actual_weather.snow_precipitation,
 	),
-	SENSOR_TEMPERATURE: SensorEntityDescription(
-		key=SENSOR_TEMPERATURE,
+	SensorType.TEMPERATURE: SensorEntityDescription(
+		key=SensorType.TEMPERATURE,
 		name="Temperature",
 		device_class=SensorDeviceClass.TEMPERATURE,
 		native_unit_of_measurement=UnitOfTemperature.CELSIUS,
 		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
+		value_func=lambda actual_weather: actual_weather.temperature,
 	),
-	SENSOR_WIND_SPEED: SensorEntityDescription(
-		key=SENSOR_WIND_SPEED,
+	SensorType.WIND_SPEED: SensorEntityDescription(
+		key=SensorType.WIND_SPEED,
 		name="Wind speed",
 		device_class=SensorDeviceClass.WIND_SPEED,
 		native_unit_of_measurement=UnitOfSpeed.METERS_PER_SECOND,
 		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
+		value_func=lambda actual_weather: actual_weather.wind_speed,
 	),
-	SENSOR_WIND_GUST_SPEED: SensorEntityDescription(
-		key=SENSOR_WIND_GUST_SPEED,
+	SensorType.WIND_GUST_SPEED: SensorEntityDescription(
+		key=SensorType.WIND_GUST_SPEED,
 		name="Wind gust speed",
 		device_class=SensorDeviceClass.WIND_SPEED,
 		native_unit_of_measurement=UnitOfSpeed.METERS_PER_SECOND,
 		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
+		value_func=lambda actual_weather: actual_weather.wind_gust_speed,
 	),
 }
 
@@ -119,23 +136,24 @@ async def async_setup_entry(hass: core.HomeAssistant, config_entry: config_entri
 
 	for sensor_type in SENSORS:
 		async_add_entities([
-			SensorEntity(coordinator, config_entry.data, sensor_type, SENSORS[sensor_type]),
+			SensorEntity(coordinator, config_entry.data, SENSORS[sensor_type]),
 		])
 
 
 class SensorEntity(CoordinatorEntity, ComponentSensorEntity):
 
+	entity_description: SensorEntityDescription
+
 	_attr_has_entity_name = True
 
-	def __init__(self, coordinator: DataUpdateCoordinator, config: MappingProxyType, sensor_type: str, entity_description: SensorEntityDescription):
+	def __init__(self, coordinator: DataUpdateCoordinator, config: MappingProxyType, entity_description: SensorEntityDescription):
 		super().__init__(coordinator)
 
-		self._sensor_type: str = sensor_type
 		self.entity_description = entity_description
 
 		self._attr_unique_id = "{}.{}".format(
 			config[CONF_NAME],
-			self._sensor_type,
+			self.entity_description.key,
 		)
 
 		self._attr_device_info = DeviceInfo(
@@ -154,24 +172,7 @@ class SensorEntity(CoordinatorEntity, ComponentSensorEntity):
 
 		actual_weather: AladinActualWeather = self.coordinator.data.actual_weather
 
-		if self._sensor_type == SENSOR_APPARENT_TEMPERATURE:
-			self._attr_native_value = actual_weather.apparent_temperature
-		elif self._sensor_type == SENSOR_CLOUDS:
-			self._attr_native_value = actual_weather.clouds
-		elif self._sensor_type == SENSOR_HUMIDITY:
-			self._attr_native_value = actual_weather.humidity
-		elif self._sensor_type == SENSOR_PRECIPITATION:
-			self._attr_native_value = actual_weather.precipitation
-		elif self._sensor_type == SENSOR_PRESSURE:
-			self._attr_native_value = actual_weather.pressure
-		elif self._sensor_type == SENSOR_SNOW_PRECIPITATION:
-			self._attr_native_value = actual_weather.snow_precipitation
-		elif self._sensor_type == SENSOR_TEMPERATURE:
-			self._attr_native_value = actual_weather.temperature
-		elif self._sensor_type == SENSOR_WIND_SPEED:
-			self._attr_native_value = actual_weather.wind_speed
-		elif self._sensor_type == SENSOR_WIND_GUST_SPEED:
-			self._attr_native_value = actual_weather.wind_gust_speed
+		self._attr_native_value = self.entity_description.value_func(actual_weather)
 
 	@callback
 	def _handle_coordinator_update(self) -> None:
