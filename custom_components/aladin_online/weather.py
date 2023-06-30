@@ -9,6 +9,7 @@ from homeassistant.const import (
 )
 from homeassistant.components.weather import (
 	ATTR_FORECAST_CONDITION,
+	ATTR_FORECAST_HUMIDITY,
 	ATTR_FORECAST_NATIVE_TEMP,
 	ATTR_FORECAST_NATIVE_PRECIPITATION,
 	ATTR_FORECAST_NATIVE_PRESSURE,
@@ -90,6 +91,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 			self._attr_forecast.append({
 				ATTR_FORECAST_TIME: hourly_forecast.datetime,
 				ATTR_FORECAST_CONDITION: hourly_forecast.condition,
+				ATTR_FORECAST_HUMIDITY: hourly_forecast.humidity,
 				ATTR_FORECAST_NATIVE_TEMP: round(hourly_forecast.temperature, 1),
 				ATTR_FORECAST_NATIVE_PRECIPITATION: round(hourly_forecast.precipitation, 1),
 				ATTR_FORECAST_NATIVE_PRESSURE: round(hourly_forecast.pressure, 1),
