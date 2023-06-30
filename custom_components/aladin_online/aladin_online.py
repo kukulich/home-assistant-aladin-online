@@ -78,7 +78,7 @@ class AladinActualWeather:
 
 class AladinWeatherForecast:
 
-	def __init__(self, forecast_datetime: datetime, condition: str, temperature: float, precipitation: float, pressure: float, wind_speed: float, wind_bearing: float) -> None:
+	def __init__(self, forecast_datetime: datetime, condition: str, temperature: float, precipitation: float, pressure: float, wind_speed: float, wind_bearing: float, wind_gust_speed: float) -> None:
 		self.datetime = forecast_datetime
 		self.condition = condition
 		self.temperature = temperature
@@ -86,6 +86,7 @@ class AladinWeatherForecast:
 		self.pressure = pressure
 		self.wind_speed = wind_speed
 		self.wind_bearing = wind_bearing
+		self.wind_gust_speed = wind_gust_speed
 
 
 class AladinWeather:
@@ -158,6 +159,7 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 				AladinOnlineCoordinator._format_pressure(parameters[DATA_PARAMETER_PRESSURE][i]),
 				AladinOnlineCoordinator._format_wind_speed(parameters[DATA_PARAMETER_WIND_SPEED][i]),
 				AladinOnlineCoordinator._format_wind_direction(parameters[DATA_PARAMETER_WIND_DIRECTION][i]),
+				AladinOnlineCoordinator._format_wind_direction(parameters[DATA_PARAMETER_WIND_GUST_SPEED][i]),
 			)
 
 			weather.add_hourly_forecast(forecast)

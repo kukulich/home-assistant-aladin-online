@@ -12,6 +12,7 @@ from homeassistant.components.weather import (
 	ATTR_FORECAST_NATIVE_TEMP,
 	ATTR_FORECAST_NATIVE_PRECIPITATION,
 	ATTR_FORECAST_NATIVE_PRESSURE,
+	ATTR_FORECAST_NATIVE_WIND_GUST_SPEED,
 	ATTR_FORECAST_NATIVE_WIND_SPEED,
 	ATTR_FORECAST_TIME,
 	ATTR_FORECAST_WIND_BEARING,
@@ -76,6 +77,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 		self._attr_native_temperature = round(actual_weather.temperature, 1)
 		self._attr_native_wind_speed = round(actual_weather.wind_speed, 1)
 		self._attr_wind_bearing = round(actual_weather.wind_bearing, 2)
+		self._attr_native_wind_gust_speed = round(actual_weather.wind_gust_speed, 1)
 
 		now = datetime.datetime.now()
 
@@ -93,6 +95,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 				ATTR_FORECAST_NATIVE_PRESSURE: round(hourly_forecast.pressure, 1),
 				ATTR_FORECAST_NATIVE_WIND_SPEED: round(hourly_forecast.wind_speed, 1),
 				ATTR_FORECAST_WIND_BEARING: round(hourly_forecast.wind_bearing, 2),
+				ATTR_FORECAST_NATIVE_WIND_GUST_SPEED: round(hourly_forecast.wind_gust_speed, 1),
 			})
 
 	@callback
