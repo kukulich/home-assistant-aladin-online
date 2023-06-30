@@ -8,6 +8,7 @@ from homeassistant.const import (
 	UnitOfTemperature,
 )
 from homeassistant.components.weather import (
+	ATTR_FORECAST_CLOUD_COVERAGE,
 	ATTR_FORECAST_CONDITION,
 	ATTR_FORECAST_HUMIDITY,
 	ATTR_FORECAST_NATIVE_APPARENT_TEMP,
@@ -81,6 +82,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 		self._attr_wind_bearing = round(actual_weather.wind_bearing, 2)
 		self._attr_native_wind_gust_speed = round(actual_weather.wind_gust_speed, 1)
 		self._attr_native_apparent_temperature = round(actual_weather.apparent_temperature, 1)
+		self._attr_cloud_coverage = int(round(actual_weather.clouds))
 
 		now = datetime.datetime.now()
 
@@ -93,6 +95,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 			self._attr_forecast.append({
 				ATTR_FORECAST_TIME: hourly_forecast.datetime,
 				ATTR_FORECAST_CONDITION: hourly_forecast.condition,
+				ATTR_FORECAST_CLOUD_COVERAGE: int(round(hourly_forecast.clouds)),
 				ATTR_FORECAST_HUMIDITY: hourly_forecast.humidity,
 				ATTR_FORECAST_NATIVE_APPARENT_TEMP: round(hourly_forecast.apparent_temperature, 1),
 				ATTR_FORECAST_NATIVE_TEMP: round(hourly_forecast.temperature, 1),

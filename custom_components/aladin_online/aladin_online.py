@@ -90,6 +90,7 @@ class AladinWeatherForecast:
 		wind_bearing: float,
 		wind_gust_speed: float,
 		humidity: float,
+		clouds: float,
 	) -> None:
 		self.datetime = forecast_datetime
 		self.condition = condition
@@ -101,6 +102,7 @@ class AladinWeatherForecast:
 		self.wind_bearing = wind_bearing
 		self.wind_gust_speed = wind_gust_speed
 		self.humidity = humidity
+		self.clouds = clouds
 
 class AladinWeather:
 
@@ -175,6 +177,7 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 				AladinOnlineCoordinator._format_wind_direction(parameters[DATA_PARAMETER_WIND_DIRECTION][i]),
 				AladinOnlineCoordinator._format_wind_direction(parameters[DATA_PARAMETER_WIND_GUST_SPEED][i]),
 				AladinOnlineCoordinator._format_percent(parameters[DATA_PARAMETER_HUMIDITY][i]),
+				AladinOnlineCoordinator._format_percent(parameters[DATA_PARAMETER_CLOUDS][i]),
 			)
 
 			weather.add_hourly_forecast(forecast)
