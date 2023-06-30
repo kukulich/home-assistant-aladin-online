@@ -10,6 +10,7 @@ from homeassistant.const import (
 from homeassistant.components.weather import (
 	ATTR_FORECAST_CONDITION,
 	ATTR_FORECAST_HUMIDITY,
+	ATTR_FORECAST_NATIVE_APPARENT_TEMP,
 	ATTR_FORECAST_NATIVE_TEMP,
 	ATTR_FORECAST_NATIVE_PRECIPITATION,
 	ATTR_FORECAST_NATIVE_PRESSURE,
@@ -79,6 +80,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 		self._attr_native_wind_speed = round(actual_weather.wind_speed, 1)
 		self._attr_wind_bearing = round(actual_weather.wind_bearing, 2)
 		self._attr_native_wind_gust_speed = round(actual_weather.wind_gust_speed, 1)
+		self._attr_native_apparent_temperature = round(actual_weather.apparent_temperature, 1)
 
 		now = datetime.datetime.now()
 
@@ -92,6 +94,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 				ATTR_FORECAST_TIME: hourly_forecast.datetime,
 				ATTR_FORECAST_CONDITION: hourly_forecast.condition,
 				ATTR_FORECAST_HUMIDITY: hourly_forecast.humidity,
+				ATTR_FORECAST_NATIVE_APPARENT_TEMP: round(hourly_forecast.apparent_temperature, 1),
 				ATTR_FORECAST_NATIVE_TEMP: round(hourly_forecast.temperature, 1),
 				ATTR_FORECAST_NATIVE_PRECIPITATION: round(hourly_forecast.precipitation, 1),
 				ATTR_FORECAST_NATIVE_PRESSURE: round(hourly_forecast.pressure, 1),

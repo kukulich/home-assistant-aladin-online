@@ -83,6 +83,7 @@ class AladinWeatherForecast:
 		forecast_datetime: datetime,
 		condition: str,
 		temperature: float,
+		apparent_temperature: float,
 		precipitation: float,
 		pressure: float,
 		wind_speed: float,
@@ -93,6 +94,7 @@ class AladinWeatherForecast:
 		self.datetime = forecast_datetime
 		self.condition = condition
 		self.temperature = temperature
+		self.apparent_temperature = apparent_temperature
 		self.precipitation = precipitation
 		self.pressure = pressure
 		self.wind_speed = wind_speed
@@ -166,6 +168,7 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 				forecast_datetime,
 				AladinOnlineCoordinator._format_condition(self._data[DATA_CONDITIONS][forecast_condition_index]),
 				AladinOnlineCoordinator._format_temperature(parameters[DATA_PARAMETER_TEMPERATURE][i]),
+				AladinOnlineCoordinator._format_temperature(parameters[DATA_PARAMETER_APPARENT_TEMPERATURE][i]),
 				AladinOnlineCoordinator._format_precipitation(parameters[DATA_PARAMETER_PRECIPITATION][i]),
 				AladinOnlineCoordinator._format_pressure(parameters[DATA_PARAMETER_PRESSURE][i]),
 				AladinOnlineCoordinator._format_wind_speed(parameters[DATA_PARAMETER_WIND_SPEED][i]),
