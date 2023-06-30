@@ -39,6 +39,7 @@ async def async_setup_entry(hass: core.HomeAssistant, config_entry: config_entri
 
 class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 
+	_attr_name = None
 	_attr_has_entity_name = True
 	_attr_native_precipitation_unit = UnitOfLength.MILLIMETERS
 	_attr_native_pressure_unit = UnitOfPressure.HPA
