@@ -137,6 +137,8 @@ class SensorEntity(CoordinatorEntity, ComponentSensorEntity):
 
 	_attr_has_entity_name = True
 
+	_attr_name = None
+
 	def __init__(self, coordinator: DataUpdateCoordinator, config: MappingProxyType, entity_description: SensorEntityDescription):
 		super().__init__(coordinator)
 
