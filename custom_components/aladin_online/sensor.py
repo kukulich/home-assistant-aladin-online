@@ -1,8 +1,8 @@
 from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
+from enum import StrEnum
 from homeassistant import config_entries, core
-from homeassistant.backports.enum import StrEnum
 from homeassistant.const import (
 	PERCENTAGE,
 	UnitOfPressure,
