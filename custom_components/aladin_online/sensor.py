@@ -43,7 +43,7 @@ class SensorType(StrEnum):
 	WIND_SPEED = "wind_speed"
 	WIND_GUST_SPEED = "wind_gust_speed"
 
-@dataclass
+@dataclass(frozen=True, kw_only=True)
 class SensorEntityDescription(ComponentSensorEntityDescription):
 	value_func: Callable | None = None
 
