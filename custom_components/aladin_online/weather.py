@@ -111,10 +111,6 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 				ATTR_FORECAST_NATIVE_WIND_GUST_SPEED: round(hourly_forecast.wind_gust_speed, 1),
 			})
 
-	@property
-	def forecast(self) -> list[Forecast] | None:
-		return self._forecast
-
 	async def async_forecast_hourly(self) -> list[Forecast] | None:
 		return self._forecast
 
