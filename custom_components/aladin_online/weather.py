@@ -35,6 +35,7 @@ from .const import (
 	NAME,
 )
 
+
 async def async_setup_entry(hass: core.HomeAssistant, config_entry: config_entries.ConfigEntry, async_add_entities) -> None:
 	coordinator = hass.data[DOMAIN][config_entry.entry_id][DATA_COORDINATOR]
 
@@ -98,7 +99,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 				continue
 
 			self._forecast.append({
-				ATTR_FORECAST_TIME: hourly_forecast.datetime,
+				ATTR_FORECAST_TIME: hourly_forecast.datetime.isoformat(),
 				ATTR_FORECAST_CONDITION: hourly_forecast.condition,
 				ATTR_FORECAST_CLOUD_COVERAGE: int(round(hourly_forecast.clouds)),
 				ATTR_FORECAST_HUMIDITY: hourly_forecast.humidity,
