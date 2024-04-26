@@ -15,7 +15,7 @@ async def async_setup_entry(hass: core.HomeAssistant, config_entry: config_entri
 
 	coordinator = AladinOnlineCoordinator(hass, config_entry.data)
 
-	await coordinator.async_refresh()
+	await coordinator.async_config_entry_first_refresh()
 
 	hass.data[DOMAIN][config_entry.entry_id][DATA_COORDINATOR] = coordinator
 
