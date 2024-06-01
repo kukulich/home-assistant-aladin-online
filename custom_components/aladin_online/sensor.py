@@ -31,6 +31,7 @@ from .const import (
 	NAME,
 )
 
+
 class SensorType(StrEnum):
 	APPARENT_TEMPERATURE = "apparent_temperature"
 	CLOUDS = "clouds"
@@ -42,9 +43,11 @@ class SensorType(StrEnum):
 	WIND_SPEED = "wind_speed"
 	WIND_GUST_SPEED = "wind_gust_speed"
 
+
 @dataclass(frozen=True, kw_only=True)
 class SensorEntityDescription(ComponentSensorEntityDescription):
 	value_func: Callable | None = None
+
 
 SENSORS: Dict[SensorType, SensorEntityDescription] = {
 	SensorType.APPARENT_TEMPERATURE: SensorEntityDescription(
@@ -120,6 +123,7 @@ SENSORS: Dict[SensorType, SensorEntityDescription] = {
 		value_func=lambda actual_weather: actual_weather.wind_gust_speed,
 	),
 }
+
 
 async def async_setup_entry(hass: HomeAssistant, config_entry: AladinOnlineConfigEntry, async_add_entities) -> None:
 	coordinator = config_entry.runtime_data

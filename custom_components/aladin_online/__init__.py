@@ -11,6 +11,7 @@ PLATFORMS: Final = [
 	Platform.WEATHER,
 ]
 
+
 async def async_setup_entry(hass: core.HomeAssistant, config_entry: AladinOnlineConfigEntry) -> bool:
 	coordinator = AladinOnlineCoordinator(hass, config_entry.data)
 
@@ -21,6 +22,7 @@ async def async_setup_entry(hass: core.HomeAssistant, config_entry: AladinOnline
 	await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
 
 	return True
+
 
 async def async_unload_entry(hass: core.HomeAssistant, config_entry: config_entries.ConfigEntry) -> bool:
 	return await hass.config_entries.async_unload_platforms(config_entry, PLATFORMS)
