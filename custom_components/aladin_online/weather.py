@@ -23,21 +23,21 @@ from homeassistant.components.weather import (
 	WeatherEntity as ComponentWeatherEntity,
 	WeatherEntityFeature,
 )
-from homeassistant.core import callback
+from homeassistant.core import callback, HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 from homeassistant.helpers.device_registry import DeviceEntryType
 from types import MappingProxyType
+from . import AladinOnlineConfigEntry
 from .aladin_online import AladinActualWeather
 from .const import (
 	DOMAIN,
-	DATA_COORDINATOR,
 	NAME,
 )
 
 
-async def async_setup_entry(hass: core.HomeAssistant, config_entry: config_entries.ConfigEntry, async_add_entities) -> None:
-	coordinator = hass.data[DOMAIN][config_entry.entry_id][DATA_COORDINATOR]
+async def async_setup_entry(hass: HomeAssistant, config_entry: AladinOnlineConfigEntry, async_add_entities) -> None:
+	coordinator = config_entry.runtime_data
 
 	async_add_entities([
 		WeatherEntity(coordinator, config_entry.data),
