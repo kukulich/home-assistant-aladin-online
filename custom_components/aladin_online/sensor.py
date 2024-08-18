@@ -2,7 +2,6 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
-from homeassistant import config_entries, core
 from homeassistant.const import (
 	PERCENTAGE,
 	UnitOfPressure,
@@ -19,18 +18,19 @@ from homeassistant.components.sensor import (
 from homeassistant.const import (
 	CONF_NAME,
 )
-from homeassistant.core import callback
+from homeassistant.core import callback, HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 from homeassistant.helpers.device_registry import DeviceEntryType
 from types import MappingProxyType
 from typing import Dict
+from . import AladinOnlineConfigEntry
 from .aladin_online import AladinActualWeather
 from .const import (
 	DOMAIN,
-	DATA_COORDINATOR,
 	NAME,
 )
+
 
 class SensorType(StrEnum):
 	APPARENT_TEMPERATURE = "apparent_temperature"
@@ -43,9 +43,11 @@ class SensorType(StrEnum):
 	WIND_SPEED = "wind_speed"
 	WIND_GUST_SPEED = "wind_gust_speed"
 
-@dataclass
+
+@dataclass(frozen=True, kw_only=True)
 class SensorEntityDescription(ComponentSensorEntityDescription):
 	value_func: Callable | None = None
+
 
 SENSORS: Dict[SensorType, SensorEntityDescription] = {
 	SensorType.APPARENT_TEMPERATURE: SensorEntityDescription(
@@ -122,8 +124,9 @@ SENSORS: Dict[SensorType, SensorEntityDescription] = {
 	),
 }
 
-async def async_setup_entry(hass: core.HomeAssistant, config_entry: config_entries.ConfigEntry, async_add_entities) -> None:
-	coordinator = hass.data[DOMAIN][config_entry.entry_id][DATA_COORDINATOR]
+
+async def async_setup_entry(hass: HomeAssistant, config_entry: AladinOnlineConfigEntry, async_add_entities) -> None:
+	coordinator = config_entry.runtime_data
 
 	for sensor_type in SENSORS:
 		async_add_entities([

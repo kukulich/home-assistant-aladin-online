@@ -23,20 +23,21 @@ from homeassistant.components.weather import (
 	WeatherEntity as ComponentWeatherEntity,
 	WeatherEntityFeature,
 )
-from homeassistant.core import callback
+from homeassistant.core import callback, HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 from homeassistant.helpers.device_registry import DeviceEntryType
 from types import MappingProxyType
+from . import AladinOnlineConfigEntry
 from .aladin_online import AladinActualWeather
 from .const import (
 	DOMAIN,
-	DATA_COORDINATOR,
 	NAME,
 )
 
-async def async_setup_entry(hass: core.HomeAssistant, config_entry: config_entries.ConfigEntry, async_add_entities) -> None:
-	coordinator = hass.data[DOMAIN][config_entry.entry_id][DATA_COORDINATOR]
+
+async def async_setup_entry(hass: HomeAssistant, config_entry: AladinOnlineConfigEntry, async_add_entities) -> None:
+	coordinator = config_entry.runtime_data
 
 	async_add_entities([
 		WeatherEntity(coordinator, config_entry.data),
@@ -98,7 +99,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 				continue
 
 			self._forecast.append({
-				ATTR_FORECAST_TIME: hourly_forecast.datetime,
+				ATTR_FORECAST_TIME: hourly_forecast.datetime.isoformat(),
 				ATTR_FORECAST_CONDITION: hourly_forecast.condition,
 				ATTR_FORECAST_CLOUD_COVERAGE: int(round(hourly_forecast.clouds)),
 				ATTR_FORECAST_HUMIDITY: hourly_forecast.humidity,
@@ -110,10 +111,6 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 				ATTR_FORECAST_WIND_BEARING: round(hourly_forecast.wind_bearing, 2),
 				ATTR_FORECAST_NATIVE_WIND_GUST_SPEED: round(hourly_forecast.wind_gust_speed, 1),
 			})
-
-	@property
-	def forecast(self) -> list[Forecast] | None:
-		return self._forecast
 
 	async def async_forecast_hourly(self) -> list[Forecast] | None:
 		return self._forecast
