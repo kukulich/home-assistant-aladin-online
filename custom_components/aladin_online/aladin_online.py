@@ -15,9 +15,9 @@ from homeassistant.const import (
 )
 from homeassistant.helpers import aiohttp_client
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-from homeassistant.util import dt
 from http import HTTPStatus
 import math
+import pytz
 from .const import (
 	DOMAIN,
 	LOGGER,
@@ -205,9 +205,7 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 
 	@staticmethod
 	async def _format_datetime(raw: str) -> datetime:
-		timezone = await dt.async_get_time_zone("Europe/Prague")
-		dt.set_default_time_zone(timezone)
-		return dt.parse_datetime(raw)
+		return pytz.timezone("Europe/Prague").localize(datetime.fromisoformat(raw)).astimezone(pytz.utc).replace(tzinfo=None)
 
 	@staticmethod
 	def _format_condition(raw: str) -> str:
