@@ -15,7 +15,6 @@ from homeassistant.const import (
 )
 from homeassistant.helpers import aiohttp_client
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-from homeassistant.util import dt
 from http import HTTPStatus
 import math
 from .const import (
@@ -27,7 +26,7 @@ from .errors import NoData, ServiceUnavailable
 from types import MappingProxyType
 from typing import Final, List
 
-DATA_TIME: Final = "forecastTimeIso"
+DATA_TIME: Final = "forecastTime"
 DATA_FORECAST_LENGTH: Final = "forecastLength"
 DATA_PARAMETERS: Final = "parameterValues"
 DATA_CONDITIONS: Final = "weatherIconNames"
@@ -133,7 +132,7 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 		if self._data is None:
 			raise ServiceUnavailable
 
-		data_time = await AladinOnlineCoordinator._format_datetime(self._data[DATA_TIME])
+		data_time = AladinOnlineCoordinator._format_datetime(self._data[DATA_TIME])
 		now = datetime.now()
 
 		actual_index = int(math.floor((now.timestamp() - data_time.timestamp()) / 3600))
@@ -204,10 +203,8 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 		self._data = await response.json(content_type=None)
 
 	@staticmethod
-	async def _format_datetime(raw: str) -> datetime:
-		timezone = await dt.async_get_time_zone("Europe/Prague")
-		dt.set_default_time_zone(timezone)
-		return dt.parse_datetime(raw)
+	def _format_datetime(raw: str) -> datetime:
+		return datetime.strptime(raw, "%b %d, %Y %I:%M:%S %p")
 
 	@staticmethod
 	def _format_condition(raw: str) -> str:
