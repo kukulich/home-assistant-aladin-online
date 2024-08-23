@@ -1,5 +1,4 @@
 import datetime
-from homeassistant import config_entries, core
 from homeassistant.const import (
 	CONF_NAME,
 	UnitOfLength,
