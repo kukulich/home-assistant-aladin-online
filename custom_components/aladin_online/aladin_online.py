@@ -115,7 +115,7 @@ class AladinWeather:
 class AladinOnlineCoordinator(DataUpdateCoordinator):
 
 	def __init__(self, hass: core.HomeAssistant, config: MappingProxyType) -> None:
-		super().__init__(hass, LOGGER, name=DOMAIN, update_interval=timedelta(hours=1), update_method=self.update)
+		super().__init__(hass, LOGGER, name=DOMAIN, update_interval=timedelta(minutes=1), update_method=self.update)
 
 		self._config: MappingProxyType = config
 
