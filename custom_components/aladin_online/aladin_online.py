@@ -160,7 +160,7 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 
 		weather = AladinWeather(actual_weather)
 
-		for i in range(0, self._data[DATA_FORECAST_LENGTH]):
+		for i in range(actual_index + 1, self._data[DATA_FORECAST_LENGTH]):
 			forecast_datetime = data_time + timedelta(hours=i)
 			forecast_condition_index = int(math.floor(i / 2))
 

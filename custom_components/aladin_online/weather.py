@@ -89,9 +89,14 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 		self._attr_native_apparent_temperature = round(actual_weather.apparent_temperature, 1)
 		self._attr_cloud_coverage = int(round(actual_weather.clouds))
 
+		now = datetime.datetime.now()
+
 		self._forecast: list[Forecast] = []
 
 		for hourly_forecast in self.coordinator.data.hourly_forecasts:
+			if hourly_forecast.datetime < now:
+				continue
+
 			self._forecast.append({
 				ATTR_FORECAST_TIME: hourly_forecast.datetime.isoformat(),
 				ATTR_FORECAST_CONDITION: hourly_forecast.condition,
