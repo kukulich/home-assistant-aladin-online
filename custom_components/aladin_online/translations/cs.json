@@ -10,10 +10,20 @@
 				"data_description": {
 	                 "station_id": "Najděte svou obec na https://www.chmi.cz/predpoved-pocasi/meteogramy-aladin/ a zkopírujte číselné ID z URL"
 				}
+			},
+			"reconfigure": {
+				"title": "Aladin online (Česká republika)",
+				"data": {
+					"station_id": "ID stanice"
+				},
+				"data_description": {
+	                 "station_id": "Najděte svou obec na https://www.chmi.cz/predpoved-pocasi/meteogramy-aladin/ a zkopírujte číselné ID z URL"
+				}
 			}
 		},
 		"abort": {
 			"already_configured": "Aladin online pro tento název je již nastaven.",
+			"reconfigure_successful": "Změna nastavení proběhla úspěšně.",
 			"service_unavailable": "Služba není dostupná.",
 			"unknown": "Neznámá chyba při připojování ke službě."
 		}
