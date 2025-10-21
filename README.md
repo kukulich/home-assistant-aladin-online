@@ -4,7 +4,9 @@
 
 Home Assistant custom component for Aladin in the Czech Republic.
 
-Data source: https://aladinonline.androworks.org/
+Data source: https://www.chmi.cz/predpoved-pocasi/meteogramy-aladin/
+
+Find your municipality at https://www.chmi.cz/predpoved-pocasi/meteogramy-aladin/ and copy the numeric ID from the URL.
 
 ## Installation
 

@@ -33,7 +33,6 @@ from .const import (
 
 
 class SensorType(StrEnum):
-	APPARENT_TEMPERATURE = "apparent_temperature"
 	CLOUDS = "clouds"
 	HUMIDITY = "humidity"
 	PRECIPITATION = "precipitation"
@@ -50,14 +49,6 @@ class SensorEntityDescription(ComponentSensorEntityDescription):
 
 
 SENSORS: Dict[SensorType, SensorEntityDescription] = {
-	SensorType.APPARENT_TEMPERATURE: SensorEntityDescription(
-		key=SensorType.APPARENT_TEMPERATURE,
-		device_class=SensorDeviceClass.TEMPERATURE,
-		native_unit_of_measurement=UnitOfTemperature.CELSIUS,
-		suggested_display_precision=1,
-		state_class=SensorStateClass.MEASUREMENT,
-		value_func=lambda actual_weather: actual_weather.apparent_temperature,
-	),
 	SensorType.CLOUDS: SensorEntityDescription(
 		key=SensorType.CLOUDS,
 		icon="mdi:weather-partly-cloudy",
@@ -152,7 +143,7 @@ class SensorEntity(CoordinatorEntity, ComponentSensorEntity):
 		)
 
 		self._attr_device_info = DeviceInfo(
-			identifiers={(DOMAIN,)},
+			identifiers={(DOMAIN, config[CONF_NAME])},
 			model="Weather forecast",
 			name=config[CONF_NAME],
 			manufacturer=NAME,

@@ -1,4 +1,3 @@
-import datetime
 from homeassistant.const import (
 	CONF_NAME,
 	UnitOfLength,
@@ -10,7 +9,6 @@ from homeassistant.components.weather import (
 	ATTR_FORECAST_CLOUD_COVERAGE,
 	ATTR_FORECAST_CONDITION,
 	ATTR_FORECAST_HUMIDITY,
-	ATTR_FORECAST_NATIVE_APPARENT_TEMP,
 	ATTR_FORECAST_NATIVE_TEMP,
 	ATTR_FORECAST_NATIVE_PRECIPITATION,
 	ATTR_FORECAST_NATIVE_PRESSURE,
@@ -26,6 +24,7 @@ from homeassistant.core import callback, HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 from homeassistant.helpers.device_registry import DeviceEntryType
+from homeassistant.util import dt
 from types import MappingProxyType
 from . import AladinOnlineConfigEntry
 from .aladin_online import AladinActualWeather
@@ -64,7 +63,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 		)
 
 		self._attr_device_info = DeviceInfo(
-			identifiers={(DOMAIN,)},
+			identifiers={(DOMAIN, config[CONF_NAME])},
 			model="Weather forecast",
 			name=config[CONF_NAME],
 			manufacturer=NAME,
@@ -86,10 +85,9 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 		self._attr_native_wind_speed = round(actual_weather.wind_speed, 1)
 		self._attr_wind_bearing = round(actual_weather.wind_bearing, 2)
 		self._attr_native_wind_gust_speed = round(actual_weather.wind_gust_speed, 1)
-		self._attr_native_apparent_temperature = round(actual_weather.apparent_temperature, 1)
 		self._attr_cloud_coverage = int(round(actual_weather.clouds))
 
-		now = datetime.datetime.now()
+		now = dt.now()
 
 		self._forecast: list[Forecast] = []
 
@@ -102,7 +100,6 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 				ATTR_FORECAST_CONDITION: hourly_forecast.condition,
 				ATTR_FORECAST_CLOUD_COVERAGE: int(round(hourly_forecast.clouds)),
 				ATTR_FORECAST_HUMIDITY: hourly_forecast.humidity,
-				ATTR_FORECAST_NATIVE_APPARENT_TEMP: round(hourly_forecast.apparent_temperature, 1),
 				ATTR_FORECAST_NATIVE_TEMP: round(hourly_forecast.temperature, 1),
 				ATTR_FORECAST_NATIVE_PRECIPITATION: round(hourly_forecast.precipitation, 1),
 				ATTR_FORECAST_NATIVE_PRESSURE: round(hourly_forecast.pressure, 1),
@@ -112,6 +109,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 			})
 
 	async def async_forecast_hourly(self) -> list[Forecast] | None:
+		self._update_attributes()
 		return self._forecast
 
 	@callback

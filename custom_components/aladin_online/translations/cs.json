@@ -5,22 +5,21 @@
 				"title": "Aladin online (Česká republika)",
 				"data": {
 					"name": "Název",
-					"latitude": "Zeměpisná šířka",
-					"longitude": "Zeměpisná délka"
+					"station_id": "ID stanice"
+				},
+				"data_description": {
+	                 "station_id": "Najděte svou obec na https://www.chmi.cz/predpoved-pocasi/meteogramy-aladin/ a zkopírujte číselné ID z URL"
 				}
 			}
 		},
 		"abort": {
 			"already_configured": "Aladin online pro tento název je již nastaven.",
 			"service_unavailable": "Služba není dostupná.",
-			"location_unavailable": "Lokace není dostupná."
+			"unknown": "Neznámá chyba při připojování ke službě."
 		}
 	},
 	"entity": {
 		"sensor": {
-			"apparent_temperature": {
-				"name": "Pocitová teplota"
-			},
 			"clouds": {
 				"name": "Oblačnost"
 			},
@@ -46,4 +45,5 @@
 				"name": "Nárazová rychlost větru"
 			}
 		}
-	}}
+	}
+}

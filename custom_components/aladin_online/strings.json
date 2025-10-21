@@ -5,22 +5,21 @@
 				"title": "Aladin online (Czech Republic)",
 				"data": {
 					"name": "Name",
-					"latitude": "Latitude",
-					"longitude": "Longitude"
+					"station_id": "Station ID"
+				},
+				"data_description": {
+	                 "station_id": "Find your municipality at https://www.chmi.cz/predpoved-pocasi/meteogramy-aladin/ and copy the numeric ID from the URL"
 				}
 			}
 		},
 		"abort": {
 			"already_configured": "Aladin online for this name is already configured.",
 			"service_unavailable": "Service is not available.",
-			"location_unavailable": "Location is not available."
+			"unknown": "Unknown error connecting to the service."
 		}
 	},
 	"entity": {
 		"sensor": {
-			"apparent_temperature": {
-				"name": "Apparent temperature"
-			},
 			"clouds": {
 				"name": "Clouds"
 			},

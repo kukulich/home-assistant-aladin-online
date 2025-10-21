@@ -1,13 +1,17 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from homeassistant import core
 from homeassistant.components.weather import (
 	ATTR_CONDITION_CLEAR_NIGHT,
 	ATTR_CONDITION_CLOUDY,
+	ATTR_CONDITION_FOG,
+	ATTR_CONDITION_LIGHTNING,
+	ATTR_CONDITION_LIGHTNING_RAINY,
 	ATTR_CONDITION_PARTLYCLOUDY,
 	ATTR_CONDITION_POURING,
 	ATTR_CONDITION_SNOWY,
 	ATTR_CONDITION_SUNNY,
 	ATTR_CONDITION_RAINY,
+	ATTR_CONDITION_WINDY,
 )
 from homeassistant.const import (
 	CONF_LATITUDE,
@@ -21,27 +25,33 @@ import math
 from .const import (
 	DOMAIN,
 	LOGGER,
+	CONF_STATION_ID,
 	URL,
 )
 from .errors import NoData, ServiceUnavailable
 from types import MappingProxyType
 from typing import Final, List
 
-DATA_TIME: Final = "forecastTimeIso"
-DATA_FORECAST_LENGTH: Final = "forecastLength"
-DATA_PARAMETERS: Final = "parameterValues"
-DATA_CONDITIONS: Final = "weatherIconNames"
-DATA_PARAMETER_CLOUDS: Final = "CLOUDS_TOTAL"
-DATA_PARAMETER_HUMIDITY: Final = "HUMIDITY"
-DATA_PARAMETER_PRECIPITATION: Final = "PRECIPITATION_TOTAL"
-DATA_PARAMETER_PRESSURE: Final = "PRESSURE"
-DATA_PARAMETER_SNOW_PRECIPITATION: Final = "PRECIPITATION_SNOW"
-DATA_PARAMETER_TEMPERATURE: Final = "TEMPERATURE"
-DATA_PARAMETER_APPARENT_TEMPERATURE: Final = "APPARENT_TEMPERATURE"
-DATA_PARAMETER_WIND_DIRECTION: Final = "WIND_DIRECTION"
-DATA_PARAMETER_WIND_SPEED: Final = "WIND_SPEED"
-DATA_PARAMETER_WIND_GUST_SPEED: Final = "WIND_GUST_SPEED"
-DATA_PARAMETER_WIND_GUST_DIRECTION: Final = "WIND_GUST_DIRECTION"
+URL: Final = "https://data-provider.chmi.cz/api/graphs/graf.meteogram/{}"
+
+# Mapování číselných ikon na HA podmínky
+ICON_CONDITION_MAP = {
+	10:  ATTR_CONDITION_SUNNY,          # jasno den
+	20:  ATTR_CONDITION_SUNNY,          # skoro jasno den
+	40:  ATTR_CONDITION_PARTLYCLOUDY,   # polojasno
+	60:  ATTR_CONDITION_PARTLYCLOUDY,   # skoro zataženo
+	70:  ATTR_CONDITION_RAINY,          # zataženo + déšť
+	79:  ATTR_CONDITION_LIGHTNING_RAINY,# blesky
+	80:  ATTR_CONDITION_CLOUDY,         # zataženo
+	81:  ATTR_CONDITION_POURING,        # zataženo + silný déšť
+	86:  ATTR_CONDITION_LIGHTNING_RAINY,# silný déšť + blesky
+	90:  ATTR_CONDITION_FOG,            # zataženo + silný déšť
+	110: ATTR_CONDITION_CLEAR_NIGHT,    # jasno noc
+	120: ATTR_CONDITION_PARTLYCLOUDY,   # skoro jasno noc
+	140: ATTR_CONDITION_CLOUDY,   		# polojasno noc
+	160: ATTR_CONDITION_CLOUDY,   		# skoro zataženo noc
+	170: ATTR_CONDITION_CLOUDY,         # zataženo noc
+}
 
 
 class AladinActualWeather:
@@ -50,7 +60,6 @@ class AladinActualWeather:
 		self,
 		condition: str,
 		temperature: float,
-		apparent_temperature: float,
 		precipitation: float,
 		pressure: float,
 		humidity: float,
@@ -63,7 +72,6 @@ class AladinActualWeather:
 	) -> None:
 		self.condition = condition
 		self.temperature = temperature
-		self.apparent_temperature = apparent_temperature
 		self.precipitation = precipitation
 		self.pressure = pressure
 		self.humidity = humidity
@@ -79,10 +87,9 @@ class AladinWeatherForecast:
 
 	def __init__(
 		self,
-		forecast_datetime: datetime,
+		forecast_datetime: dt.datetime,
 		condition: str,
 		temperature: float,
-		apparent_temperature: float,
 		precipitation: float,
 		pressure: float,
 		wind_speed: float,
@@ -94,7 +101,6 @@ class AladinWeatherForecast:
 		self.datetime = forecast_datetime
 		self.condition = condition
 		self.temperature = temperature
-		self.apparent_temperature = apparent_temperature
 		self.precipitation = precipitation
 		self.pressure = pressure
 		self.wind_speed = wind_speed
@@ -102,6 +108,7 @@ class AladinWeatherForecast:
 		self.wind_gust_speed = wind_gust_speed
 		self.humidity = humidity
 		self.clouds = clouds
+
 
 class AladinWeather:
 
@@ -116,10 +123,9 @@ class AladinWeather:
 class AladinOnlineCoordinator(DataUpdateCoordinator):
 
 	def __init__(self, hass: core.HomeAssistant, config: MappingProxyType) -> None:
-		super().__init__(hass, LOGGER, name=DOMAIN, update_interval=timedelta(minutes=1), update_method=self.update)
+		super().__init__(hass, LOGGER, name=DOMAIN, update_interval=timedelta(minutes=30), update_method=self.update)
 
 		self._config: MappingProxyType = config
-
 		self._data = None
 
 	async def update(self) -> AladinWeather:
@@ -133,127 +139,82 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 		if self._data is None:
 			raise ServiceUnavailable
 
-		data_time = await AladinOnlineCoordinator._format_datetime(self._data[DATA_TIME])
-		now = datetime.now()
-
-		actual_index = int(math.floor((now.timestamp() - data_time.timestamp()) / 3600))
-		condition_actual_index = int(math.floor(actual_index / 2))
-
-		parameters = self._data[DATA_PARAMETERS]
-
-		if condition_actual_index >= len(self._data[DATA_CONDITIONS]):
+		entries = self._data.get("data", [])
+		if not entries:
 			raise NoData
 
+		now = dt.utcnow()
+
+		# Najdi aktuální hodinu v datech
+		actual_entry = None
+		actual_index = 0
+		for i, entry in enumerate(entries):
+			entry_time = dt.parse_datetime(entry["validityTime"])
+			if entry_time <= now:
+				actual_entry = entry
+				actual_index = i
+			else:
+				break
+
+		if actual_entry is None:
+			actual_entry = entries[0]
+			actual_index = 0
+
 		actual_weather = AladinActualWeather(
-			AladinOnlineCoordinator._format_condition(self._data[DATA_CONDITIONS][condition_actual_index]),
-			AladinOnlineCoordinator._format_temperature(parameters[DATA_PARAMETER_TEMPERATURE][actual_index]),
-			AladinOnlineCoordinator._format_temperature(parameters[DATA_PARAMETER_APPARENT_TEMPERATURE][actual_index]),
-			AladinOnlineCoordinator._format_precipitation(parameters[DATA_PARAMETER_PRECIPITATION][actual_index]),
-			AladinOnlineCoordinator._format_pressure(parameters[DATA_PARAMETER_PRESSURE][actual_index]),
-			AladinOnlineCoordinator._format_percent(parameters[DATA_PARAMETER_HUMIDITY][actual_index]),
-			AladinOnlineCoordinator._format_percent(parameters[DATA_PARAMETER_CLOUDS][actual_index]),
-			AladinOnlineCoordinator._format_wind_speed(parameters[DATA_PARAMETER_WIND_SPEED][actual_index]),
-			AladinOnlineCoordinator._format_wind_direction(parameters[DATA_PARAMETER_WIND_DIRECTION][actual_index]),
-			AladinOnlineCoordinator._format_wind_speed(parameters[DATA_PARAMETER_WIND_GUST_SPEED][actual_index]),
-			AladinOnlineCoordinator._format_wind_direction(parameters[DATA_PARAMETER_WIND_GUST_DIRECTION][actual_index]),
-			AladinOnlineCoordinator._format_precipitation(parameters[DATA_PARAMETER_SNOW_PRECIPITATION][actual_index]),
+			condition=AladinOnlineCoordinator._format_condition(actual_entry.get("icon", 0)),
+			temperature=actual_entry.get("t2m"),
+			precipitation=actual_entry.get("prec", 0),
+			pressure=actual_entry.get("mslp"),              # už v hPa, nepřepočítávat
+			humidity=actual_entry.get("rh2m"),              # už v %, nepřepočítávat
+			clouds=actual_entry.get("cloudsTot"),            # už v %, nepřepočítávat
+			wind_speed=actual_entry.get("windSpeed", 0),
+			wind_bearing=AladinOnlineCoordinator._format_wind_direction(actual_entry.get("windDirection", 0)),
+			wind_gust_speed=actual_entry.get("windGustSpeed", 0),
+			wind_gust_bearing=AladinOnlineCoordinator._format_wind_direction(actual_entry.get("windDirection", 0)),
+			snow_precipitation=actual_entry.get("snow", 0),
 		)
 
 		weather = AladinWeather(actual_weather)
 
-		for i in range(actual_index + 1, self._data[DATA_FORECAST_LENGTH]):
-			forecast_datetime = data_time + timedelta(hours=i)
-			forecast_condition_index = int(math.floor(i / 2))
+		for entry in entries[actual_index + 1:]:
+			forecast_datetime = dt.parse_datetime(entry["validityTime"])
 
 			forecast = AladinWeatherForecast(
-				forecast_datetime,
-				AladinOnlineCoordinator._format_condition(self._data[DATA_CONDITIONS][forecast_condition_index]),
-				AladinOnlineCoordinator._format_temperature(parameters[DATA_PARAMETER_TEMPERATURE][i]),
-				AladinOnlineCoordinator._format_temperature(parameters[DATA_PARAMETER_APPARENT_TEMPERATURE][i]),
-				AladinOnlineCoordinator._format_precipitation(parameters[DATA_PARAMETER_PRECIPITATION][i]),
-				AladinOnlineCoordinator._format_pressure(parameters[DATA_PARAMETER_PRESSURE][i]),
-				AladinOnlineCoordinator._format_wind_speed(parameters[DATA_PARAMETER_WIND_SPEED][i]),
-				AladinOnlineCoordinator._format_wind_direction(parameters[DATA_PARAMETER_WIND_DIRECTION][i]),
-				AladinOnlineCoordinator._format_wind_speed(parameters[DATA_PARAMETER_WIND_GUST_SPEED][i]),
-				AladinOnlineCoordinator._format_percent(parameters[DATA_PARAMETER_HUMIDITY][i]),
-				AladinOnlineCoordinator._format_percent(parameters[DATA_PARAMETER_CLOUDS][i]),
+				forecast_datetime=forecast_datetime,
+				condition=AladinOnlineCoordinator._format_condition(entry.get("icon", 0)),
+				temperature=entry.get("t2m"),
+				precipitation=entry.get("prec", 0),
+				pressure=entry.get("mslp"),
+				wind_speed=entry.get("windSpeed", 0),
+				wind_bearing=AladinOnlineCoordinator._format_wind_direction(entry.get("windDirection", 0)),
+				wind_gust_speed=entry.get("windGustSpeed", 0),
+				humidity=entry.get("rh2m"),
+				clouds=entry.get("cloudsTot"),
 			)
-
 			weather.add_hourly_forecast(forecast)
 
 		return weather
 
 	def _should_update_data(self) -> bool:
-		if self._data is None:
-			return True
-
-		# Updates are in 0, 5, 12 and 17 hour so wait an hour to be sure the update is there
-		if datetime.now().hour in [1, 6, 13, 18]:
-			return True
-
-		return False
+		return True
 
 	async def _update_data(self) -> None:
 		session = aiohttp_client.async_get_clientsession(self.hass)
-		response = await session.get(URL.format(self._config[CONF_LATITUDE], self._config[CONF_LONGITUDE]))
+		station_id = self._config.get(CONF_STATION_ID)
+		response = await session.get(URL.format(station_id))
 
 		if response.status != HTTPStatus.OK:
 			raise ServiceUnavailable
 
-		# The URL returns "text/html" so ignore content_type check
 		self._data = await response.json(content_type=None)
 
 	@staticmethod
-	async def _format_datetime(raw: str) -> datetime:
-		# The time is in UTC
-		return dt.parse_datetime(raw)
-
-	@staticmethod
-	def _format_condition(raw: str) -> str:
-		mapping = {
-			"wi_cloud_snow_heavy": ATTR_CONDITION_SNOWY,
-			"wi_cloud_snow_medium": ATTR_CONDITION_SNOWY,
-			"wi_cloud_snow_light": ATTR_CONDITION_SNOWY,
-			"wi_night_cloud_snow": ATTR_CONDITION_SNOWY,
-			"wi_day_cloud_snow": ATTR_CONDITION_SNOWY,
-			"wi_day_cloud_rain": ATTR_CONDITION_RAINY,
-			"wi_night_cloud_rain": ATTR_CONDITION_RAINY,
-			"wi_cloud_rain_heavy": ATTR_CONDITION_RAINY,
-			"wi_cloud_rain_medium": ATTR_CONDITION_RAINY,
-			"wi_cloud_rain_light": ATTR_CONDITION_POURING,
-			"wi_cloud": ATTR_CONDITION_CLOUDY,
-			"wi_night_cloud": ATTR_CONDITION_PARTLYCLOUDY,
-			"wi_day_cloud": ATTR_CONDITION_PARTLYCLOUDY,
-			"wi_night": ATTR_CONDITION_CLEAR_NIGHT,
-			"wi_day": ATTR_CONDITION_SUNNY,
-		}
-
-		if raw in mapping:
-			return mapping[raw]
-
-		LOGGER.error("Unknown condition: {}".format(raw))
+	def _format_condition(icon: int) -> str:
+		if icon in ICON_CONDITION_MAP:
+			return ICON_CONDITION_MAP[icon]
+		LOGGER.warning("Neznámá ikona počasí: {}".format(icon))
 		return ATTR_CONDITION_SUNNY
 
 	@staticmethod
-	def _format_temperature(raw: float) -> float:
-		return raw
-
-	@staticmethod
-	def _format_percent(raw: float) -> float:
-		return raw * 100
-
-	@staticmethod
-	def _format_precipitation(raw: float) -> float:
-		return abs(raw)
-
-	@staticmethod
-	def _format_pressure(raw: float) -> float:
-		return raw / 100
-
-	@staticmethod
-	def _format_wind_speed(raw: float) -> float:
-		return raw
-
-	@staticmethod
 	def _format_wind_direction(raw: float) -> float:
-		return (raw + 180) % 360
+		return raw % 360
