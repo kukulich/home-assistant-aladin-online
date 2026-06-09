@@ -152,7 +152,7 @@ class SensorEntity(CoordinatorEntity, ComponentSensorEntity):
 		)
 
 		self._attr_device_info = DeviceInfo(
-			identifiers={(DOMAIN,)},
+			identifiers={(DOMAIN, config[CONF_NAME])},
 			model="Weather forecast",
 			name=config[CONF_NAME],
 			manufacturer=NAME,

@@ -5,15 +5,14 @@
 				"title": "Aladin online (Česká republika)",
 				"data": {
 					"name": "Název",
-					"latitude": "Zeměpisná šířka",
-					"longitude": "Zeměpisná délka"
+					"station_id": "ID stanice"
 				}
 			}
 		},
 		"abort": {
 			"already_configured": "Aladin online pro tento název je již nastaven.",
 			"service_unavailable": "Služba není dostupná.",
-			"location_unavailable": "Lokace není dostupná."
+			"unknown": "Neznámá chyba při připojování ke službě."
 		}
 	},
 	"entity": {
@@ -46,4 +45,5 @@
 				"name": "Nárazová rychlost větru"
 			}
 		}
-	}}
+	}
+}
