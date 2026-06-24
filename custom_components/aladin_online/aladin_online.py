@@ -4,14 +4,13 @@ from homeassistant.components.weather import (
 	ATTR_CONDITION_CLEAR_NIGHT,
 	ATTR_CONDITION_CLOUDY,
 	ATTR_CONDITION_FOG,
-	ATTR_CONDITION_LIGHTNING,
+	ATTR_CONDITION_HAIL,
 	ATTR_CONDITION_LIGHTNING_RAINY,
 	ATTR_CONDITION_PARTLYCLOUDY,
-	ATTR_CONDITION_POURING,
 	ATTR_CONDITION_SNOWY,
+	ATTR_CONDITION_SNOWY_RAINY,
 	ATTR_CONDITION_SUNNY,
 	ATTR_CONDITION_RAINY,
-	ATTR_CONDITION_WINDY,
 )
 from homeassistant.const import (
 	CONF_LATITUDE,
@@ -34,23 +33,70 @@ from typing import Final, List
 
 URL: Final = "https://data-provider.chmi.cz/api/graphs/graf.meteogram/{}"
 
-# Mapování číselných ikon na HA podmínky
+# Mapování číselných ikon počasí z ČHMÚ na podmínky Home Assistant
+# Zdroj ikon: https://www.chmi.cz/predpoved-pocasi/ikony-pocasi
 ICON_CONDITION_MAP = {
-	10:  ATTR_CONDITION_SUNNY,          # jasno den
-	20:  ATTR_CONDITION_SUNNY,          # skoro jasno den
-	40:  ATTR_CONDITION_PARTLYCLOUDY,   # polojasno
-	60:  ATTR_CONDITION_PARTLYCLOUDY,   # skoro zataženo
-	70:  ATTR_CONDITION_RAINY,          # zataženo + déšť
-	79:  ATTR_CONDITION_LIGHTNING_RAINY,# blesky
-	80:  ATTR_CONDITION_CLOUDY,         # zataženo
-	81:  ATTR_CONDITION_POURING,        # zataženo + silný déšť
-	86:  ATTR_CONDITION_LIGHTNING_RAINY,# silný déšť + blesky
-	90:  ATTR_CONDITION_FOG,            # zataženo + silný déšť
-	110: ATTR_CONDITION_CLEAR_NIGHT,    # jasno noc
-	120: ATTR_CONDITION_PARTLYCLOUDY,   # skoro jasno noc
-	140: ATTR_CONDITION_CLOUDY,   		# polojasno noc
-	160: ATTR_CONDITION_CLOUDY,   		# skoro zataženo noc
-	170: ATTR_CONDITION_CLOUDY,         # zataženo noc
+	# Denní ikony
+	10:  ATTR_CONDITION_SUNNY,           # Jasno
+	20:  ATTR_CONDITION_SUNNY,           # Skoro jasno
+	40:  ATTR_CONDITION_PARTLYCLOUDY,    # Polojasno
+	41:  ATTR_CONDITION_RAINY,           # Polojasno, přeháňka
+	43:  ATTR_CONDITION_SNOWY_RAINY,     # Polojasno, přeháňka se sněhem
+	45:  ATTR_CONDITION_SNOWY,           # Polojasno, sněhová přeháňka
+	46:  ATTR_CONDITION_LIGHTNING_RAINY, # Polojasno, bouřka
+	60:  ATTR_CONDITION_PARTLYCLOUDY,    # Oblačno
+	61:  ATTR_CONDITION_RAINY,           # Oblačno, přeháňka
+	62:  ATTR_CONDITION_SNOWY_RAINY,     # Oblačno, mrznoucí déšť
+	63:  ATTR_CONDITION_SNOWY_RAINY,     # Oblačno, přeháňka deště se sněhem
+	64:  ATTR_CONDITION_SNOWY,           # Oblačno, sněžení
+	65:  ATTR_CONDITION_SNOWY,           # Oblačno, sněhová přeháňka
+	66:  ATTR_CONDITION_LIGHTNING_RAINY, # Oblačno, bouřka
+	69:  ATTR_CONDITION_HAIL,            # Oblačno, kroupy
+	70:  ATTR_CONDITION_CLOUDY,          # Skoro zataženo
+	71:  ATTR_CONDITION_RAINY,           # Skoro zataženo, déšť nebo přeháňka
+	72:  ATTR_CONDITION_SNOWY_RAINY,     # Skoro zataženo, mrznoucí déšť
+	73:  ATTR_CONDITION_SNOWY_RAINY,     # Skoro zataženo, déšť se sněhem
+	74:  ATTR_CONDITION_SNOWY,           # Skoro zataženo, sněžení
+	75:  ATTR_CONDITION_SNOWY,           # Skoro zataženo, sněhová přeháňka
+	76:  ATTR_CONDITION_LIGHTNING_RAINY, # Skoro zataženo, bouřka
+	79:  ATTR_CONDITION_HAIL,            # Skoro zataženo, kroupy
+	80:  ATTR_CONDITION_CLOUDY,          # Zataženo
+	81:  ATTR_CONDITION_RAINY,           # Zataženo, déšť nebo přeháňka
+	82:  ATTR_CONDITION_SNOWY_RAINY,     # Zataženo, mrznoucí déšť
+	83:  ATTR_CONDITION_SNOWY_RAINY,     # Zataženo, déšť se sněhem
+	84:  ATTR_CONDITION_SNOWY,           # Zataženo, sněžení
+	85:  ATTR_CONDITION_SNOWY,           # Zataženo, sněhová přeháňka
+	86:  ATTR_CONDITION_LIGHTNING_RAINY, # Zataženo, bouřka
+	89:  ATTR_CONDITION_HAIL,            # Zataženo, kroupy
+	90:  ATTR_CONDITION_FOG,             # Mlha
+	91:  ATTR_CONDITION_FOG,             # Mlha, přeháňka
+	92:  ATTR_CONDITION_FOG,             # Mlha, mrznoucí déšť
+	93:  ATTR_CONDITION_FOG,             # Mlha, déšť se sněhem
+	94:  ATTR_CONDITION_FOG,             # Mlha, sněžení
+	# Noční ikony
+	110: ATTR_CONDITION_CLEAR_NIGHT,     # Jasno
+	120: ATTR_CONDITION_CLEAR_NIGHT,     # Skoro jasno
+	140: ATTR_CONDITION_PARTLYCLOUDY,    # Polojasno
+	141: ATTR_CONDITION_RAINY,           # Polojasno, přeháňka
+	143: ATTR_CONDITION_SNOWY_RAINY,     # Polojasno, přeháňka deště se sněhem
+	145: ATTR_CONDITION_SNOWY,           # Polojasno, sněhová přeháňka
+	146: ATTR_CONDITION_LIGHTNING_RAINY, # Polojasno, bouřka
+	160: ATTR_CONDITION_PARTLYCLOUDY,    # Oblačno
+	161: ATTR_CONDITION_RAINY,           # Oblačno, přeháňka
+	162: ATTR_CONDITION_SNOWY_RAINY,     # Oblačno, mrznoucí déšť
+	163: ATTR_CONDITION_SNOWY_RAINY,     # Oblačno, přeháňka deště se sněhem
+	164: ATTR_CONDITION_SNOWY,           # Oblačno, sněžení
+	165: ATTR_CONDITION_SNOWY,           # Oblačno, sněhová přeháňka
+	166: ATTR_CONDITION_LIGHTNING_RAINY, # Oblačno, bouřka
+	169: ATTR_CONDITION_HAIL,            # Oblačno, kroupy
+	170: ATTR_CONDITION_CLOUDY,          # Skoro zataženo
+	171: ATTR_CONDITION_RAINY,           # Skoro zataženo, déšť nebo přeháňka
+	172: ATTR_CONDITION_SNOWY_RAINY,     # Skoro zataženo, mrznoucí déšť
+	173: ATTR_CONDITION_SNOWY_RAINY,     # Skoro zataženo, déšť se sněhem
+	174: ATTR_CONDITION_SNOWY,           # Skoro zataženo, sněžení
+	175: ATTR_CONDITION_SNOWY,           # Skoro zataženo, sněhová přeháňka
+	176: ATTR_CONDITION_LIGHTNING_RAINY, # Skoro zataženo, bouřka
+	179: ATTR_CONDITION_HAIL,            # Skoro zataženo, kroupy
 }
 
 
