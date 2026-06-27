@@ -33,70 +33,70 @@ from typing import Final, List
 
 URL: Final = "https://data-provider.chmi.cz/api/graphs/graf.meteogram/{}"
 
-# Mapování číselných ikon počasí z ČHMÚ na podmínky Home Assistant
-# Zdroj ikon: https://www.chmi.cz/predpoved-pocasi/ikony-pocasi
+# Mapping of CHMI numeric weather icons to Home Assistant conditions
+# Icon source: https://www.chmi.cz/predpoved-pocasi/ikony-pocasi
 ICON_CONDITION_MAP = {
-	# Denní ikony
-	10:  ATTR_CONDITION_SUNNY,           # Jasno
-	20:  ATTR_CONDITION_SUNNY,           # Skoro jasno
-	40:  ATTR_CONDITION_PARTLYCLOUDY,    # Polojasno
-	41:  ATTR_CONDITION_RAINY,           # Polojasno, přeháňka
-	43:  ATTR_CONDITION_SNOWY_RAINY,     # Polojasno, přeháňka se sněhem
-	45:  ATTR_CONDITION_SNOWY,           # Polojasno, sněhová přeháňka
-	46:  ATTR_CONDITION_LIGHTNING_RAINY, # Polojasno, bouřka
-	60:  ATTR_CONDITION_PARTLYCLOUDY,    # Oblačno
-	61:  ATTR_CONDITION_RAINY,           # Oblačno, přeháňka
-	62:  ATTR_CONDITION_SNOWY_RAINY,     # Oblačno, mrznoucí déšť
-	63:  ATTR_CONDITION_SNOWY_RAINY,     # Oblačno, přeháňka deště se sněhem
-	64:  ATTR_CONDITION_SNOWY,           # Oblačno, sněžení
-	65:  ATTR_CONDITION_SNOWY,           # Oblačno, sněhová přeháňka
-	66:  ATTR_CONDITION_LIGHTNING_RAINY, # Oblačno, bouřka
-	69:  ATTR_CONDITION_HAIL,            # Oblačno, kroupy
-	70:  ATTR_CONDITION_CLOUDY,          # Skoro zataženo
-	71:  ATTR_CONDITION_RAINY,           # Skoro zataženo, déšť nebo přeháňka
-	72:  ATTR_CONDITION_SNOWY_RAINY,     # Skoro zataženo, mrznoucí déšť
-	73:  ATTR_CONDITION_SNOWY_RAINY,     # Skoro zataženo, déšť se sněhem
-	74:  ATTR_CONDITION_SNOWY,           # Skoro zataženo, sněžení
-	75:  ATTR_CONDITION_SNOWY,           # Skoro zataženo, sněhová přeháňka
-	76:  ATTR_CONDITION_LIGHTNING_RAINY, # Skoro zataženo, bouřka
-	79:  ATTR_CONDITION_HAIL,            # Skoro zataženo, kroupy
-	80:  ATTR_CONDITION_CLOUDY,          # Zataženo
-	81:  ATTR_CONDITION_RAINY,           # Zataženo, déšť nebo přeháňka
-	82:  ATTR_CONDITION_SNOWY_RAINY,     # Zataženo, mrznoucí déšť
-	83:  ATTR_CONDITION_SNOWY_RAINY,     # Zataženo, déšť se sněhem
-	84:  ATTR_CONDITION_SNOWY,           # Zataženo, sněžení
-	85:  ATTR_CONDITION_SNOWY,           # Zataženo, sněhová přeháňka
-	86:  ATTR_CONDITION_LIGHTNING_RAINY, # Zataženo, bouřka
-	89:  ATTR_CONDITION_HAIL,            # Zataženo, kroupy
-	90:  ATTR_CONDITION_FOG,             # Mlha
-	91:  ATTR_CONDITION_FOG,             # Mlha, přeháňka
-	92:  ATTR_CONDITION_FOG,             # Mlha, mrznoucí déšť
-	93:  ATTR_CONDITION_FOG,             # Mlha, déšť se sněhem
-	94:  ATTR_CONDITION_FOG,             # Mlha, sněžení
-	# Noční ikony
-	110: ATTR_CONDITION_CLEAR_NIGHT,     # Jasno
-	120: ATTR_CONDITION_CLEAR_NIGHT,     # Skoro jasno
-	140: ATTR_CONDITION_PARTLYCLOUDY,    # Polojasno
-	141: ATTR_CONDITION_RAINY,           # Polojasno, přeháňka
-	143: ATTR_CONDITION_SNOWY_RAINY,     # Polojasno, přeháňka deště se sněhem
-	145: ATTR_CONDITION_SNOWY,           # Polojasno, sněhová přeháňka
-	146: ATTR_CONDITION_LIGHTNING_RAINY, # Polojasno, bouřka
-	160: ATTR_CONDITION_PARTLYCLOUDY,    # Oblačno
-	161: ATTR_CONDITION_RAINY,           # Oblačno, přeháňka
-	162: ATTR_CONDITION_SNOWY_RAINY,     # Oblačno, mrznoucí déšť
-	163: ATTR_CONDITION_SNOWY_RAINY,     # Oblačno, přeháňka deště se sněhem
-	164: ATTR_CONDITION_SNOWY,           # Oblačno, sněžení
-	165: ATTR_CONDITION_SNOWY,           # Oblačno, sněhová přeháňka
-	166: ATTR_CONDITION_LIGHTNING_RAINY, # Oblačno, bouřka
-	169: ATTR_CONDITION_HAIL,            # Oblačno, kroupy
-	170: ATTR_CONDITION_CLOUDY,          # Skoro zataženo
-	171: ATTR_CONDITION_RAINY,           # Skoro zataženo, déšť nebo přeháňka
-	172: ATTR_CONDITION_SNOWY_RAINY,     # Skoro zataženo, mrznoucí déšť
-	173: ATTR_CONDITION_SNOWY_RAINY,     # Skoro zataženo, déšť se sněhem
-	174: ATTR_CONDITION_SNOWY,           # Skoro zataženo, sněžení
-	175: ATTR_CONDITION_SNOWY,           # Skoro zataženo, sněhová přeháňka
-	176: ATTR_CONDITION_LIGHTNING_RAINY, # Skoro zataženo, bouřka
-	179: ATTR_CONDITION_HAIL,            # Skoro zataženo, kroupy
+	# Daytime icons
+	10:  ATTR_CONDITION_SUNNY,           # Clear
+	20:  ATTR_CONDITION_SUNNY,           # Mostly clear
+	40:  ATTR_CONDITION_PARTLYCLOUDY,    # Partly cloudy
+	41:  ATTR_CONDITION_RAINY,           # Partly cloudy, shower
+	43:  ATTR_CONDITION_SNOWY_RAINY,     # Partly cloudy, sleet shower
+	45:  ATTR_CONDITION_SNOWY,           # Partly cloudy, snow shower
+	46:  ATTR_CONDITION_LIGHTNING_RAINY, # Partly cloudy, thunderstorm
+	60:  ATTR_CONDITION_PARTLYCLOUDY,    # Cloudy
+	61:  ATTR_CONDITION_RAINY,           # Cloudy, shower
+	62:  ATTR_CONDITION_SNOWY_RAINY,     # Cloudy, freezing rain
+	63:  ATTR_CONDITION_SNOWY_RAINY,     # Cloudy, sleet shower
+	64:  ATTR_CONDITION_SNOWY,           # Cloudy, snowfall
+	65:  ATTR_CONDITION_SNOWY,           # Cloudy, snow shower
+	66:  ATTR_CONDITION_LIGHTNING_RAINY, # Cloudy, thunderstorm
+	69:  ATTR_CONDITION_HAIL,            # Cloudy, hail
+	70:  ATTR_CONDITION_CLOUDY,          # Mostly overcast
+	71:  ATTR_CONDITION_RAINY,           # Mostly overcast, rain or shower
+	72:  ATTR_CONDITION_SNOWY_RAINY,     # Mostly overcast, freezing rain
+	73:  ATTR_CONDITION_SNOWY_RAINY,     # Mostly overcast, sleet
+	74:  ATTR_CONDITION_SNOWY,           # Mostly overcast, snowfall
+	75:  ATTR_CONDITION_SNOWY,           # Mostly overcast, snow shower
+	76:  ATTR_CONDITION_LIGHTNING_RAINY, # Mostly overcast, thunderstorm
+	79:  ATTR_CONDITION_HAIL,            # Mostly overcast, hail
+	80:  ATTR_CONDITION_CLOUDY,          # Overcast
+	81:  ATTR_CONDITION_RAINY,           # Overcast, rain or shower
+	82:  ATTR_CONDITION_SNOWY_RAINY,     # Overcast, freezing rain
+	83:  ATTR_CONDITION_SNOWY_RAINY,     # Overcast, sleet
+	84:  ATTR_CONDITION_SNOWY,           # Overcast, snowfall
+	85:  ATTR_CONDITION_SNOWY,           # Overcast, snow shower
+	86:  ATTR_CONDITION_LIGHTNING_RAINY, # Overcast, thunderstorm
+	89:  ATTR_CONDITION_HAIL,            # Overcast, hail
+	90:  ATTR_CONDITION_FOG,             # Fog
+	91:  ATTR_CONDITION_FOG,             # Fog, shower
+	92:  ATTR_CONDITION_FOG,             # Fog, freezing rain
+	93:  ATTR_CONDITION_FOG,             # Fog, sleet
+	94:  ATTR_CONDITION_FOG,             # Fog, snowfall
+	# Nighttime icons
+	110: ATTR_CONDITION_CLEAR_NIGHT,     # Clear
+	120: ATTR_CONDITION_CLEAR_NIGHT,     # Mostly clear
+	140: ATTR_CONDITION_PARTLYCLOUDY,    # Partly cloudy
+	141: ATTR_CONDITION_RAINY,           # Partly cloudy, shower
+	143: ATTR_CONDITION_SNOWY_RAINY,     # Partly cloudy, sleet shower
+	145: ATTR_CONDITION_SNOWY,           # Partly cloudy, snow shower
+	146: ATTR_CONDITION_LIGHTNING_RAINY, # Partly cloudy, thunderstorm
+	160: ATTR_CONDITION_PARTLYCLOUDY,    # Cloudy
+	161: ATTR_CONDITION_RAINY,           # Cloudy, shower
+	162: ATTR_CONDITION_SNOWY_RAINY,     # Cloudy, freezing rain
+	163: ATTR_CONDITION_SNOWY_RAINY,     # Cloudy, sleet shower
+	164: ATTR_CONDITION_SNOWY,           # Cloudy, snowfall
+	165: ATTR_CONDITION_SNOWY,           # Cloudy, snow shower
+	166: ATTR_CONDITION_LIGHTNING_RAINY, # Cloudy, thunderstorm
+	169: ATTR_CONDITION_HAIL,            # Cloudy, hail
+	170: ATTR_CONDITION_CLOUDY,          # Mostly overcast
+	171: ATTR_CONDITION_RAINY,           # Mostly overcast, rain or shower
+	172: ATTR_CONDITION_SNOWY_RAINY,     # Mostly overcast, freezing rain
+	173: ATTR_CONDITION_SNOWY_RAINY,     # Mostly overcast, sleet
+	174: ATTR_CONDITION_SNOWY,           # Mostly overcast, snowfall
+	175: ATTR_CONDITION_SNOWY,           # Mostly overcast, snow shower
+	176: ATTR_CONDITION_LIGHTNING_RAINY, # Mostly overcast, thunderstorm
+	179: ATTR_CONDITION_HAIL,            # Mostly overcast, hail
 }
 
 
@@ -191,7 +191,7 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 
 		now = dt.utcnow()
 
-		# Najdi aktuální hodinu v datech
+		# Find the current hour in the data
 		actual_entry = None
 		actual_index = 0
 		for i, entry in enumerate(entries):
@@ -210,9 +210,9 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 			condition=AladinOnlineCoordinator._format_condition(actual_entry.get("icon", 0)),
 			temperature=actual_entry.get("t2m"),
 			precipitation=actual_entry.get("prec", 0),
-			pressure=actual_entry.get("mslp"),              # už v hPa, nepřepočítávat
-			humidity=actual_entry.get("rh2m"),              # už v %, nepřepočítávat
-			clouds=actual_entry.get("cloudsTot"),            # už v %, nepřepočítávat
+			pressure=actual_entry.get("mslp"),
+			humidity=actual_entry.get("rh2m"),
+			clouds=actual_entry.get("cloudsTot"),
 			wind_speed=actual_entry.get("windSpeed", 0),
 			wind_bearing=AladinOnlineCoordinator._format_wind_direction(actual_entry.get("windDirection", 0)),
 			wind_gust_speed=actual_entry.get("windGustSpeed", 0),
@@ -258,7 +258,7 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 	def _format_condition(icon: int) -> str:
 		if icon in ICON_CONDITION_MAP:
 			return ICON_CONDITION_MAP[icon]
-		LOGGER.warning("Neznámá ikona počasí: {}".format(icon))
+		LOGGER.warning("Unknown weather icon: {}".format(icon))
 		return ATTR_CONDITION_SUNNY
 
 	@staticmethod
