@@ -106,6 +106,7 @@ class AladinActualWeather:
 		self,
 		condition: str,
 		temperature: float,
+		apparent_temperature: float,
 		precipitation: float,
 		pressure: float,
 		humidity: float,
@@ -118,6 +119,7 @@ class AladinActualWeather:
 	) -> None:
 		self.condition = condition
 		self.temperature = temperature
+		self.apparent_temperature = apparent_temperature
 		self.precipitation = precipitation
 		self.pressure = pressure
 		self.humidity = humidity
@@ -136,6 +138,7 @@ class AladinWeatherForecast:
 		forecast_datetime: dt.datetime,
 		condition: str,
 		temperature: float,
+		apparent_temperature: float,
 		precipitation: float,
 		pressure: float,
 		wind_speed: float,
@@ -147,6 +150,7 @@ class AladinWeatherForecast:
 		self.datetime = forecast_datetime
 		self.condition = condition
 		self.temperature = temperature
+		self.apparent_temperature = apparent_temperature
 		self.precipitation = precipitation
 		self.pressure = pressure
 		self.wind_speed = wind_speed
@@ -209,6 +213,11 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 		actual_weather = AladinActualWeather(
 			condition=AladinOnlineCoordinator._format_condition(actual_entry.get("icon", 0)),
 			temperature=actual_entry.get("t2m"),
+			apparent_temperature=AladinOnlineCoordinator._compute_apparent_temperature(
+				actual_entry.get("t2m"),
+				actual_entry.get("rh2m"),
+				actual_entry.get("windSpeed"),
+			),
 			precipitation=actual_entry.get("prec", 0),
 			pressure=actual_entry.get("mslp"),
 			humidity=actual_entry.get("rh2m"),
@@ -229,6 +238,11 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 				forecast_datetime=forecast_datetime,
 				condition=AladinOnlineCoordinator._format_condition(entry.get("icon", 0)),
 				temperature=entry.get("t2m"),
+				apparent_temperature=AladinOnlineCoordinator._compute_apparent_temperature(
+					entry.get("t2m"),
+					entry.get("rh2m"),
+					entry.get("windSpeed"),
+				),
 				precipitation=entry.get("prec", 0),
 				pressure=entry.get("mslp"),
 				wind_speed=entry.get("windSpeed", 0),
@@ -264,3 +278,17 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 	@staticmethod
 	def _format_wind_direction(raw: float) -> float:
 		return raw % 360
+
+	@staticmethod
+	def _compute_apparent_temperature(temperature: float, humidity: float, wind_speed: float) -> float:
+		# Australian apparent temperature formula (Steadman / Bureau of Meteorology).
+		# The data source does not provide apparent temperature, so we derive it
+		# from temperature (°C), relative humidity (%) and wind speed (m/s).
+		# AT = T + 0.33·e − 0.70·ws − 4.00
+		# e  = (rh / 100) · 6.105 · exp(17.27·T / (237.7 + T))   (water vapour pressure in hPa)
+		if temperature is None or humidity is None or wind_speed is None:
+			return None
+
+		vapour_pressure = (humidity / 100) * 6.105 * math.exp(17.27 * temperature / (237.7 + temperature))
+
+		return temperature + 0.33 * vapour_pressure - 0.70 * wind_speed - 4.00

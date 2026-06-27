@@ -30,6 +30,9 @@
 	},
 	"entity": {
 		"sensor": {
+			"apparent_temperature": {
+				"name": "Apparent temperature"
+			},
 			"clouds": {
 				"name": "Clouds"
 			},

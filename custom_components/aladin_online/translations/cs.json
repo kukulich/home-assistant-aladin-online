@@ -30,6 +30,9 @@
 	},
 	"entity": {
 		"sensor": {
+			"apparent_temperature": {
+				"name": "Pocitová teplota"
+			},
 			"clouds": {
 				"name": "Oblačnost"
 			},
