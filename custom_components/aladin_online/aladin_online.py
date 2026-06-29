@@ -24,14 +24,11 @@ import math
 from .const import (
 	DOMAIN,
 	LOGGER,
-	CONF_STATION_ID,
 	URL,
 )
 from .errors import NoData, ServiceUnavailable
 from types import MappingProxyType
 from typing import Final, List
-
-URL: Final = "https://data-provider.chmi.cz/api/graphs/graf.meteogram/{}"
 
 # Mapping of CHMI numeric weather icons to Home Assistant conditions
 # Icon source: https://www.chmi.cz/predpoved-pocasi/ikony-pocasi
@@ -260,8 +257,9 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 
 	async def _update_data(self) -> None:
 		session = aiohttp_client.async_get_clientsession(self.hass)
-		station_id = self._config.get(CONF_STATION_ID)
-		response = await session.get(URL.format(station_id))
+		latitude = self._config.get(CONF_LATITUDE, self.hass.config.latitude)
+		longitude = self._config.get(CONF_LONGITUDE, self.hass.config.longitude)
+		response = await session.get(URL.format(longitude, latitude))
 
 		if response.status != HTTPStatus.OK:
 			raise ServiceUnavailable
