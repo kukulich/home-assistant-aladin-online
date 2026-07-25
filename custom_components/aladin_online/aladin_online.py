@@ -1,4 +1,9 @@
-from datetime import timedelta
+from collections.abc import Mapping
+from datetime import datetime, timedelta
+from http import HTTPStatus
+import math
+from typing import Any, NotRequired, TypedDict, cast
+
 from homeassistant import core
 from homeassistant.components.weather import (
 	ATTR_CONDITION_CLEAR_NIGHT,
@@ -19,16 +24,31 @@ from homeassistant.const import (
 from homeassistant.helpers import aiohttp_client
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import dt
-from http import HTTPStatus
-import math
+
 from .const import (
 	DOMAIN,
 	LOGGER,
 	URL,
 )
 from .errors import NoData, ServiceUnavailable
-from types import MappingProxyType
-from typing import Final, List
+
+
+class AladinEntry(TypedDict):
+	validityTime: str
+	t2m: float
+	rh2m: float
+	mslp: float
+	cloudsTot: float
+	windSpeed: float
+	icon: NotRequired[int]
+	prec: NotRequired[float]
+	windDirection: NotRequired[float]
+	windGustSpeed: NotRequired[float]
+	snow: NotRequired[float]
+
+
+class AladinResponse(TypedDict):
+	data: list[AladinEntry]
 
 # Mapping of CHMI numeric weather icons to Home Assistant conditions
 # Icon source: https://www.chmi.cz/predpoved-pocasi/ikony-pocasi
@@ -132,7 +152,7 @@ class AladinWeatherForecast:
 
 	def __init__(
 		self,
-		forecast_datetime: dt.datetime,
+		forecast_datetime: datetime,
 		condition: str,
 		temperature: float,
 		apparent_temperature: float,
@@ -161,19 +181,19 @@ class AladinWeather:
 
 	def __init__(self, actual_weather: AladinActualWeather) -> None:
 		self.actual_weather: AladinActualWeather = actual_weather
-		self.hourly_forecasts: List[AladinWeatherForecast] = []
+		self.hourly_forecasts: list[AladinWeatherForecast] = []
 
 	def add_hourly_forecast(self, forecast: AladinWeatherForecast) -> None:
 		self.hourly_forecasts.append(forecast)
 
 
-class AladinOnlineCoordinator(DataUpdateCoordinator):
+class AladinOnlineCoordinator(DataUpdateCoordinator[AladinWeather]):
 
-	def __init__(self, hass: core.HomeAssistant, config: MappingProxyType) -> None:
+	def __init__(self, hass: core.HomeAssistant, config: Mapping[str, Any]) -> None:
 		super().__init__(hass, LOGGER, name=DOMAIN, update_interval=timedelta(minutes=30), update_method=self.update)
 
-		self._config: MappingProxyType = config
-		self._data = None
+		self._config = config
+		self._data: AladinResponse | None = None
 
 	async def update(self) -> AladinWeather:
 		if self._should_update_data():
@@ -197,6 +217,8 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 		actual_index = 0
 		for i, entry in enumerate(entries):
 			entry_time = dt.parse_datetime(entry["validityTime"])
+			if entry_time is None:
+				raise NoData
 			if entry_time <= now:
 				actual_entry = entry
 				actual_index = i
@@ -209,17 +231,17 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 
 		actual_weather = AladinActualWeather(
 			condition=AladinOnlineCoordinator._format_condition(actual_entry.get("icon", 0)),
-			temperature=actual_entry.get("t2m"),
+			temperature=actual_entry["t2m"],
 			apparent_temperature=AladinOnlineCoordinator._compute_apparent_temperature(
-				actual_entry.get("t2m"),
-				actual_entry.get("rh2m"),
-				actual_entry.get("windSpeed"),
+				actual_entry["t2m"],
+				actual_entry["rh2m"],
+				actual_entry["windSpeed"],
 			),
 			precipitation=actual_entry.get("prec", 0),
-			pressure=actual_entry.get("mslp"),
-			humidity=actual_entry.get("rh2m"),
-			clouds=actual_entry.get("cloudsTot"),
-			wind_speed=actual_entry.get("windSpeed", 0),
+			pressure=actual_entry["mslp"],
+			humidity=actual_entry["rh2m"],
+			clouds=actual_entry["cloudsTot"],
+			wind_speed=actual_entry["windSpeed"],
 			wind_bearing=AladinOnlineCoordinator._format_wind_direction(actual_entry.get("windDirection", 0)),
 			wind_gust_speed=actual_entry.get("windGustSpeed", 0),
 			wind_gust_bearing=AladinOnlineCoordinator._format_wind_direction(actual_entry.get("windDirection", 0)),
@@ -230,23 +252,25 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 
 		for entry in entries[actual_index + 1:]:
 			forecast_datetime = dt.parse_datetime(entry["validityTime"])
+			if forecast_datetime is None:
+				raise NoData
 
 			forecast = AladinWeatherForecast(
 				forecast_datetime=forecast_datetime,
 				condition=AladinOnlineCoordinator._format_condition(entry.get("icon", 0)),
-				temperature=entry.get("t2m"),
+				temperature=entry["t2m"],
 				apparent_temperature=AladinOnlineCoordinator._compute_apparent_temperature(
-					entry.get("t2m"),
-					entry.get("rh2m"),
-					entry.get("windSpeed"),
+					entry["t2m"],
+					entry["rh2m"],
+					entry["windSpeed"],
 				),
 				precipitation=entry.get("prec", 0),
-				pressure=entry.get("mslp"),
-				wind_speed=entry.get("windSpeed", 0),
+				pressure=entry["mslp"],
+				wind_speed=entry["windSpeed"],
 				wind_bearing=AladinOnlineCoordinator._format_wind_direction(entry.get("windDirection", 0)),
 				wind_gust_speed=entry.get("windGustSpeed", 0),
-				humidity=entry.get("rh2m"),
-				clouds=entry.get("cloudsTot"),
+				humidity=entry["rh2m"],
+				clouds=entry["cloudsTot"],
 			)
 			weather.add_hourly_forecast(forecast)
 
@@ -264,7 +288,10 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 		if response.status != HTTPStatus.OK:
 			raise ServiceUnavailable
 
-		self._data = await response.json(content_type=None)
+		self._data = cast(
+			AladinResponse,
+			await response.json(content_type=None),
+		)
 
 	@staticmethod
 	def _format_condition(icon: int) -> str:

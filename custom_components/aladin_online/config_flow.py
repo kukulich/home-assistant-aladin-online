@@ -1,24 +1,31 @@
 from __future__ import annotations
+
+from typing import Any
+
 from homeassistant import config_entries
+from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import (
 	CONF_NAME,
 	CONF_LATITUDE,
 	CONF_LONGITUDE,
 )
-from homeassistant.data_entry_flow import AbortFlow, FlowResult
+from homeassistant.data_entry_flow import AbortFlow
 from homeassistant.helpers import aiohttp_client
 from http import HTTPStatus
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
+
 from .const import DOMAIN, NAME, URL, LOGGER
 from .errors import LocationUnavailable, ServiceUnavailable
-from typing import Any, Dict
 
 class AladinOnlineConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 	"""Weather forecast config flow."""
 
-	async def async_step_user(self, user_input: Dict[str, Any] | None = None) -> FlowResult:
-		errors = {}
+	async def async_step_user(
+		self,
+		user_input: dict[str, Any] | None = None,
+	) -> ConfigFlowResult:
+		errors: dict[str, str] = {}
 		if user_input is not None:
 			try:
 				config = {
@@ -52,8 +59,11 @@ class AladinOnlineConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 			errors=errors,
 		)
 
-	async def async_step_reconfigure(self, user_input: Dict[str, Any] | None = None) -> FlowResult:
-		errors = {}
+	async def async_step_reconfigure(
+		self,
+		user_input: dict[str, Any] | None = None,
+	) -> ConfigFlowResult:
+		errors: dict[str, str] = {}
 		reconfigure_entry = self._get_reconfigure_entry()
 		if user_input is not None:
 			try:

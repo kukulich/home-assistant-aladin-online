@@ -1,7 +1,8 @@
-from homeassistant import config_entries, core
+from homeassistant import core
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from typing import Final
+
 from .aladin_online import AladinOnlineCoordinator
 
 type AladinOnlineConfigEntry = ConfigEntry[AladinOnlineCoordinator]
@@ -24,5 +25,8 @@ async def async_setup_entry(hass: core.HomeAssistant, config_entry: AladinOnline
 	return True
 
 
-async def async_unload_entry(hass: core.HomeAssistant, config_entry: config_entries.ConfigEntry) -> bool:
+async def async_unload_entry(
+	hass: core.HomeAssistant,
+	config_entry: AladinOnlineConfigEntry,
+) -> bool:
 	return await hass.config_entries.async_unload_platforms(config_entry, PLATFORMS)

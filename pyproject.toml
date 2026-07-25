@@ -1,0 +1,7 @@
+[tool.mypy]
+python_version = "3.14"
+strict = true
+files = ["custom_components/aladin_online"]
+show_error_codes = true
+warn_unreachable = true
+

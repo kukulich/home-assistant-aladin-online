@@ -1,3 +1,6 @@
+from types import MappingProxyType
+from typing import Any
+
 from homeassistant.const import (
 	CONF_NAME,
 	UnitOfLength,
@@ -19,23 +22,27 @@ from homeassistant.components.weather import (
 	ATTR_FORECAST_WIND_BEARING,
 	Forecast,
 	WeatherEntity as ComponentWeatherEntity,
-	WeatherEntityFeature,
 )
+from homeassistant.components.weather.const import WeatherEntityFeature
 from homeassistant.core import callback, HomeAssistant
-from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
-from homeassistant.helpers.device_registry import DeviceEntryType
+from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt
-from types import MappingProxyType
+
 from . import AladinOnlineConfigEntry
-from .aladin_online import AladinActualWeather
+from .aladin_online import AladinActualWeather, AladinOnlineCoordinator
 from .const import (
 	DOMAIN,
 	NAME,
 )
 
 
-async def async_setup_entry(hass: HomeAssistant, config_entry: AladinOnlineConfigEntry, async_add_entities) -> None:
+async def async_setup_entry(
+	hass: HomeAssistant,
+	config_entry: AladinOnlineConfigEntry,
+	async_add_entities: AddEntitiesCallback,
+) -> None:
 	coordinator = config_entry.runtime_data
 
 	async_add_entities([
@@ -43,7 +50,10 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: AladinOnlineConfi
 	])
 
 
-class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
+class WeatherEntity(
+	CoordinatorEntity[AladinOnlineCoordinator],
+	ComponentWeatherEntity,
+):
 
 	_attr_name = None
 	_attr_has_entity_name = True
@@ -55,7 +65,11 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 
 	_forecast: list[Forecast] | None = None
 
-	def __init__(self, coordinator: DataUpdateCoordinator, config: MappingProxyType):
+	def __init__(
+		self,
+		coordinator: AladinOnlineCoordinator,
+		config: MappingProxyType[str, Any],
+	) -> None:
 		super().__init__(coordinator)
 
 		self._attr_unique_id = "{}.{}".format(
@@ -73,10 +87,7 @@ class WeatherEntity(CoordinatorEntity, ComponentWeatherEntity):
 
 		self._update_attributes()
 
-	def _update_attributes(self):
-		if self.coordinator.data is None:
-			return
-
+	def _update_attributes(self) -> None:
 		actual_weather: AladinActualWeather = self.coordinator.data.actual_weather
 
 		self._attr_condition = actual_weather.condition

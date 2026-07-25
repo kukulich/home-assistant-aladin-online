@@ -2,6 +2,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
+from types import MappingProxyType
+from typing import Any
 from homeassistant.const import (
 	UnitOfRatio,
 	UnitOfPressure,
@@ -19,13 +21,13 @@ from homeassistant.const import (
 	CONF_NAME,
 )
 from homeassistant.core import callback, HomeAssistant
-from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
-from homeassistant.helpers.device_registry import DeviceEntryType
-from types import MappingProxyType
-from typing import Dict
+from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import StateType
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
 from . import AladinOnlineConfigEntry
-from .aladin_online import AladinActualWeather
+from .aladin_online import AladinActualWeather, AladinOnlineCoordinator
 from .const import (
 	DOMAIN,
 	NAME,
@@ -46,10 +48,10 @@ class SensorType(StrEnum):
 
 @dataclass(frozen=True, kw_only=True)
 class SensorEntityDescription(ComponentSensorEntityDescription):
-	value_func: Callable | None = None
+	value_func: Callable[[AladinActualWeather], StateType]
 
 
-SENSORS: Dict[SensorType, SensorEntityDescription] = {
+SENSORS: dict[SensorType, SensorEntityDescription] = {
 	SensorType.APPARENT_TEMPERATURE: SensorEntityDescription(
 		key=SensorType.APPARENT_TEMPERATURE,
 		device_class=SensorDeviceClass.TEMPERATURE,
@@ -61,7 +63,7 @@ SENSORS: Dict[SensorType, SensorEntityDescription] = {
 	SensorType.CLOUDS: SensorEntityDescription(
 		key=SensorType.CLOUDS,
 		icon="mdi:weather-partly-cloudy",
-		native_unit_of_measurement=UnitOfRatio.PERCENT,
+		native_unit_of_measurement=UnitOfRatio.PERCENTAGE,
 		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
 		value_func=lambda actual_weather: actual_weather.clouds,
@@ -69,7 +71,7 @@ SENSORS: Dict[SensorType, SensorEntityDescription] = {
 	SensorType.HUMIDITY: SensorEntityDescription(
 		key=SensorType.HUMIDITY,
 		device_class=SensorDeviceClass.HUMIDITY,
-		native_unit_of_measurement=UnitOfRatio.PERCENT,
+		native_unit_of_measurement=UnitOfRatio.PERCENTAGE,
 		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
 		value_func=lambda actual_weather: actual_weather.humidity,
@@ -93,7 +95,7 @@ SENSORS: Dict[SensorType, SensorEntityDescription] = {
 	SensorType.SNOW_PRECIPITATION: SensorEntityDescription(
 		key=SensorType.SNOW_PRECIPITATION,
 		icon="mdi:weather-snowy",
-		native_unit_of_measurement=UnitOfRatio.PERCENT,
+		native_unit_of_measurement=UnitOfRatio.PERCENTAGE,
 		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
 		value_func=lambda actual_weather: actual_weather.snow_precipitation,
@@ -125,7 +127,11 @@ SENSORS: Dict[SensorType, SensorEntityDescription] = {
 }
 
 
-async def async_setup_entry(hass: HomeAssistant, config_entry: AladinOnlineConfigEntry, async_add_entities) -> None:
+async def async_setup_entry(
+	hass: HomeAssistant,
+	config_entry: AladinOnlineConfigEntry,
+	async_add_entities: AddEntitiesCallback,
+) -> None:
 	coordinator = config_entry.runtime_data
 
 	for sensor_type in SENSORS:
@@ -134,13 +140,21 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: AladinOnlineConfi
 		])
 
 
-class SensorEntity(CoordinatorEntity, ComponentSensorEntity):
+class SensorEntity(
+	CoordinatorEntity[AladinOnlineCoordinator],
+	ComponentSensorEntity,
+):
 
 	entity_description: SensorEntityDescription
 
 	_attr_has_entity_name = True
 
-	def __init__(self, coordinator: DataUpdateCoordinator, config: MappingProxyType, entity_description: SensorEntityDescription):
+	def __init__(
+		self,
+		coordinator: AladinOnlineCoordinator,
+		config: MappingProxyType[str, Any],
+		entity_description: SensorEntityDescription,
+	) -> None:
 		super().__init__(coordinator)
 
 		self.entity_description = entity_description
@@ -161,10 +175,7 @@ class SensorEntity(CoordinatorEntity, ComponentSensorEntity):
 
 		self._update_attributes()
 
-	def _update_attributes(self):
-		if self.coordinator.data is None:
-			return
-
+	def _update_attributes(self) -> None:
 		actual_weather: AladinActualWeather = self.coordinator.data.actual_weather
 
 		self._attr_native_value = self.entity_description.value_func(actual_weather)
