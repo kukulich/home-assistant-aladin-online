@@ -3,7 +3,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from enum import StrEnum
 from homeassistant.const import (
-	PERCENTAGE,
+	UnitOfRatio,
 	UnitOfPressure,
 	UnitOfSpeed,
 	UnitOfTemperature,
@@ -61,7 +61,7 @@ SENSORS: Dict[SensorType, SensorEntityDescription] = {
 	SensorType.CLOUDS: SensorEntityDescription(
 		key=SensorType.CLOUDS,
 		icon="mdi:weather-partly-cloudy",
-		native_unit_of_measurement=PERCENTAGE,
+		native_unit_of_measurement=UnitOfRatio.PERCENT,
 		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
 		value_func=lambda actual_weather: actual_weather.clouds,
@@ -69,7 +69,7 @@ SENSORS: Dict[SensorType, SensorEntityDescription] = {
 	SensorType.HUMIDITY: SensorEntityDescription(
 		key=SensorType.HUMIDITY,
 		device_class=SensorDeviceClass.HUMIDITY,
-		native_unit_of_measurement=PERCENTAGE,
+		native_unit_of_measurement=UnitOfRatio.PERCENT,
 		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
 		value_func=lambda actual_weather: actual_weather.humidity,
@@ -93,7 +93,7 @@ SENSORS: Dict[SensorType, SensorEntityDescription] = {
 	SensorType.SNOW_PRECIPITATION: SensorEntityDescription(
 		key=SensorType.SNOW_PRECIPITATION,
 		icon="mdi:weather-snowy",
-		native_unit_of_measurement=PERCENTAGE,
+		native_unit_of_measurement=UnitOfRatio.PERCENT,
 		suggested_display_precision=1,
 		state_class=SensorStateClass.MEASUREMENT,
 		value_func=lambda actual_weather: actual_weather.snow_precipitation,
