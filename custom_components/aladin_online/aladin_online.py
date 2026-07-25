@@ -284,8 +284,6 @@ class AladinOnlineCoordinator(DataUpdateCoordinator):
 		# from temperature (°C), relative humidity (%) and wind speed (m/s).
 		# AT = T + 0.33·e − 0.70·ws − 4.00
 		# e  = (rh / 100) · 6.105 · exp(17.27·T / (237.7 + T))   (water vapour pressure in hPa)
-		if temperature is None or humidity is None or wind_speed is None:
-			return None
 
 		vapour_pressure = (humidity / 100) * 6.105 * math.exp(17.27 * temperature / (237.7 + temperature))
 
